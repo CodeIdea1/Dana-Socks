@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth/web-extension';
 import { doc, setDoc } from 'firebase/firestore';
+import { FirebaseError } from 'firebase/app';
 import { auth, db } from '@/lib/firebase';
 import styles from './register.module.css';
 
@@ -43,19 +44,21 @@ export default function RegisterPage() {
             });
 
             router.push('/products');
-        } catch (error: any) {
+        } catch (err) {
             let errorMessage = 'حدث خطأ أثناء إنشاء الحساب';
 
-            if (error.code === 'auth/email-already-in-use') {
-                errorMessage = 'هذا البريد الإلكتروني مستخدم بالفعل';
-            } else if (error.code === 'auth/invalid-email') {
-                errorMessage = 'البريد الإلكتروني غير صحيح';
-            } else if (error.code === 'auth/weak-password') {
-                errorMessage = 'كلمة المرور ضعيفة جداً';
+            if (err instanceof FirebaseError) {
+                if (err.code === 'auth/email-already-in-use') {
+                    errorMessage = 'هذا البريد الإلكتروني مستخدم بالفعل';
+                } else if (err.code === 'auth/invalid-email') {
+                    errorMessage = 'البريد الإلكتروني غير صحيح';
+                } else if (err.code === 'auth/weak-password') {
+                    errorMessage = 'كلمة المرور ضعيفة جداً';
+                }
             }
 
             setError(errorMessage);
-            console.error('Registration error:', error);
+            console.error('Registration error:', err);
         } finally {
             setLoading(false);
         }
