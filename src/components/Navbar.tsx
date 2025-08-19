@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import styles from './Navbar.module.css';
+import styles from './navbar.module.css';
 
 export default function Navbar() {
     const { user } = useAuth();
