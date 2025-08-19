@@ -1,0 +1,96 @@
+/* components/Navbar.module.css */
+.navbar {
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: 80px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.navLinks {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.navLinks a {
+    color: #333;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.navLinks a:hover {
+    color: #667eea;
+}
+
+.cartLink,
+.wishlistLink {
+    background: #f8f9fa;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.cartLink {
+    color: #28a745;
+}
+
+.wishlistLink {
+    color: #dc3545;
+}
+
+.userMenu {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.signOutBtn {
+    background: #dc3545;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.signOutBtn:hover {
+    background: #c82333;
+}
+
+.authLinks {
+    display: flex;
+    gap: 20px;
+}
+
+.authLinks a {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.authLinks a:last-child {
+    background: #667eea;
+    color: white;
+}
+
+.authLinks a:last-child:hover {
+    background: #5a6fd8;
+}

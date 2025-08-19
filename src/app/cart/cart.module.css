@@ -1,0 +1,146 @@
+/* app/cart/cart.module.css */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.itemCount {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.empty {
+    text-align: center;
+    background: white;
+    padding: 60px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 40px;
+}
+
+.empty h2 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.empty p {
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 1.1rem;
+}
+
+.shopNowBtn {
+    background: #667eea;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background 0.2s ease;
+}
+
+.shopNowBtn:hover {
+    background: #5a6fd8;
+}
+
+.cartContent {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
+.cartItems {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.cartSummary {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 100px;
+}
+
+.summaryTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: #333;
+}
+
+.summaryRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+.summaryRow.total {
+    border-top: 2px solid #e9ecef;
+    padding-top: 15px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.checkoutBtn {
+    width: 100%;
+    background: #28a745;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 20px 0 15px 0;
+    transition: background 0.2s ease;
+}
+
+.checkoutBtn:hover {
+    background: #218838;
+}
+
+.continueBtn {
+    width: 100%;
+    background: transparent;
+    color: #667eea;
+    padding: 12px;
+    border: 2px solid #667eea;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.continueBtn:hover {
+    background: #667eea;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .cartContent {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .cartSummary {
+        position: static;
+    }
+}
