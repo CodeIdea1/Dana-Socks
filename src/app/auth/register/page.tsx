@@ -1,9 +1,10 @@
 'use client';
 // app/auth/register/page.tsx
+
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword } from 'firebase/auth/web-extension';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { FirebaseError } from 'firebase/app';
 import { auth, db } from '@/lib/firebase';
@@ -40,7 +41,7 @@ export default function RegisterPage() {
             // حفظ بيانات المستخدم في Firestore
             await setDoc(doc(db, 'users', user.uid), {
                 email: user.email,
-                createdAt: new Date(),
+                createdAt: new Date().toISOString(),
             });
 
             router.push('/products');
@@ -48,12 +49,16 @@ export default function RegisterPage() {
             let errorMessage = 'حدث خطأ أثناء إنشاء الحساب';
 
             if (err instanceof FirebaseError) {
-                if (err.code === 'auth/email-already-in-use') {
-                    errorMessage = 'هذا البريد الإلكتروني مستخدم بالفعل';
-                } else if (err.code === 'auth/invalid-email') {
-                    errorMessage = 'البريد الإلكتروني غير صحيح';
-                } else if (err.code === 'auth/weak-password') {
-                    errorMessage = 'كلمة المرور ضعيفة جداً';
+                switch (err.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'هذا البريد الإلكتروني مستخدم بالفعل';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'البريد الإلكتروني غير صحيح';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'كلمة المرور ضعيفة جداً';
+                        break;
                 }
             }
 

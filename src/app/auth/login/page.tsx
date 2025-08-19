@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword } from 'firebase/auth/web-extension';
+import { signInWithEmailAndPassword } from 'firebase/auth'; // ✅ التعديل هنا
 import { auth } from '@/lib/firebase';
 import styles from './login.module.css';
 
