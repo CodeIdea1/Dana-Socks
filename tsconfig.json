@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    "target": "ES2017", // إصدار JavaScript المستهدف
     "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": false,
+    "allowJs": false, // عدم السماح بملفات JavaScript
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
@@ -28,7 +28,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "next.config.js"
+    "next.config.js" // إضافة ملف next.config.js للتحقق منه
   ],
   "exclude": ["node_modules"]
 }
