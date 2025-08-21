@@ -6,6 +6,7 @@ import { db } from '@/lib/firebase';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import styles from './checkout.module.css';
 
 interface OrderData {
     fullName: string;
@@ -165,7 +166,7 @@ export default function CheckoutPage() {
     // عرض التحميل أثناء فحص حالة المصادقة
     if (authLoading) {
         return (
-            <div style={{ padding: '20px', textAlign: 'center' }}>
+            <div className={styles.loadingContainer}>
                 <h2>جاري التحميل...</h2>
             </div>
         );
@@ -173,18 +174,11 @@ export default function CheckoutPage() {
 
     if (!user) {
         return (
-            <div style={{ padding: '20px', textAlign: 'center' }}>
+            <div className={styles.authContainer}>
                 <h1>يجب تسجيل الدخول للمتابعة</h1>
                 <button
                     onClick={() => router.push('/auth/login')}
-                    style={{
-                        backgroundColor: '#007bff',
-                        color: 'white',
-                        padding: '10px 20px',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: 'pointer'
-                    }}
+                    className={styles.loginBtn}
                 >
                     تسجيل الدخول
                 </button>
@@ -194,18 +188,11 @@ export default function CheckoutPage() {
 
     if (cartItems.length === 0) {
         return (
-            <div style={{ padding: '20px', textAlign: 'center' }}>
+            <div className={styles.emptyContainer}>
                 <h1>السلة فارغة</h1>
                 <button
                     onClick={() => router.push('/products')}
-                    style={{
-                        backgroundColor: '#28a745',
-                        color: 'white',
-                        padding: '10px 20px',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: 'pointer'
-                    }}
+                    className={styles.shopBtn}
                 >
                     تسوق الآن
                 </button>
@@ -214,13 +201,13 @@ export default function CheckoutPage() {
     }
 
     return (
-        <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-            <h1>إتمام الطلب</h1>
+        <div className={styles.container}>
+            <h1 className={styles.title}>إتمام الطلب</h1>
 
             {/* تحذير المخزون */}
-            <div style={{ backgroundColor: '#e7f3ff', padding: '15px', borderRadius: '8px', marginBottom: '20px', border: '1px solid #b3d9ff' }}>
-                <h3 style={{ margin: '0 0 10px 0', color: '#0066cc' }}>📦 ملاحظة مهمة:</h3>
-                <ul style={{ margin: '0', paddingLeft: '20px', color: '#0066cc' }}>
+            <div className={styles.stockWarning}>
+                <h3 className={styles.warningTitle}>📦 ملاحظة مهمة:</h3>
+                <ul className={styles.warningList}>
                     <li>سيتم خصم الكميات من المخزون فور تأكيد الطلب</li>
                     <li>في حالة عدم توفر الكمية المطلوبة، سيتم إلغاء الطلب</li>
                     <li>سيتم تحضير الطلب وشحنه خلال 3-7 أيام عمل</li>
@@ -228,127 +215,116 @@ export default function CheckoutPage() {
             </div>
 
             {/* ملخص الطلب */}
-            <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
-                <h2>ملخص الطلب</h2>
+            <div className={styles.orderSummary}>
+                <h2 className={styles.summaryTitle}>ملخص الطلب</h2>
                 {cartItems.map(item => (
-                    <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                    <div key={item.id} className={styles.orderItem}>
                         <span>{item.name} × {item.quantity}</span>
                         <span>{(item.price * item.quantity).toFixed(2)} ج.م</span>
                     </div>
                 ))}
-                <hr />
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '18px' }}>
+                <hr className={styles.divider} />
+                <div className={styles.totalRow}>
                     <span>الإجمالي:</span>
                     <span>{getTotalPrice().toFixed(2)} ج.م</span>
                 </div>
             </div>
 
             {/* نموذج بيانات العميل */}
-            <form onSubmit={handleSubmit}>
-                <h2>بيانات التوصيل</h2>
+            <form onSubmit={handleSubmit} className={styles.checkoutForm}>
+                <h2 className={styles.formTitle}>بيانات التوصيل</h2>
 
-                <div style={{ display: 'grid', gap: '15px', marginBottom: '20px' }}>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>الاسم الكامل *</label>
+                <div className={styles.formGrid}>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="fullName" className={styles.formLabel}>
+                            الاسم الكامل *
+                        </label>
                         <input
+                            id="fullName"
                             type="text"
                             value={orderData.fullName}
                             onChange={(e) => setOrderData({ ...orderData, fullName: e.target.value })}
                             required
-                            style={{
-                                width: '100%',
-                                padding: '10px',
-                                borderRadius: '5px',
-                                border: '1px solid #ddd',
-                                fontSize: '16px'
-                            }}
+                            className={styles.formInput}
+                            placeholder="أدخل اسمك الكامل"
+                            title="الاسم الكامل مطلوب"
                         />
                     </div>
 
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>البريد الإلكتروني *</label>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="email" className={styles.formLabel}>
+                            البريد الإلكتروني *
+                        </label>
                         <input
+                            id="email"
                             type="email"
                             value={orderData.email}
                             onChange={(e) => setOrderData({ ...orderData, email: e.target.value })}
                             required
-                            style={{
-                                width: '100%',
-                                padding: '10px',
-                                borderRadius: '5px',
-                                border: '1px solid #ddd',
-                                fontSize: '16px'
-                            }}
+                            className={styles.formInput}
+                            placeholder="example@email.com"
+                            title="البريد الإلكتروني مطلوب"
                         />
                     </div>
 
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>رقم الهاتف *</label>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="phone" className={styles.formLabel}>
+                            رقم الهاتف *
+                        </label>
                         <input
+                            id="phone"
                             type="tel"
                             value={orderData.phone}
                             onChange={(e) => setOrderData({ ...orderData, phone: e.target.value })}
                             required
-                            style={{
-                                width: '100%',
-                                padding: '10px',
-                                borderRadius: '5px',
-                                border: '1px solid #ddd',
-                                fontSize: '16px'
-                            }}
+                            className={styles.formInput}
+                            placeholder="01xxxxxxxxx"
+                            title="رقم الهاتف مطلوب"
                         />
                     </div>
 
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>العنوان *</label>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="address" className={styles.formLabel}>
+                            العنوان *
+                        </label>
                         <textarea
+                            id="address"
                             value={orderData.address}
                             onChange={(e) => setOrderData({ ...orderData, address: e.target.value })}
                             required
-                            style={{
-                                width: '100%',
-                                padding: '10px',
-                                borderRadius: '5px',
-                                border: '1px solid #ddd',
-                                minHeight: '80px',
-                                fontSize: '16px',
-                                resize: 'vertical'
-                            }}
+                            className={styles.formTextarea}
+                            placeholder="أدخل عنوانك بالتفصيل"
+                            title="العنوان مطلوب"
                         />
                     </div>
 
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>المدينة *</label>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="city" className={styles.formLabel}>
+                            المدينة *
+                        </label>
                         <input
+                            id="city"
                             type="text"
                             value={orderData.city}
                             onChange={(e) => setOrderData({ ...orderData, city: e.target.value })}
                             required
-                            style={{
-                                width: '100%',
-                                padding: '10px',
-                                borderRadius: '5px',
-                                border: '1px solid #ddd',
-                                fontSize: '16px'
-                            }}
+                            className={styles.formInput}
+                            placeholder="أدخل اسم المدينة"
+                            title="المدينة مطلوبة"
                         />
                     </div>
 
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>ملاحظات إضافية</label>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="notes" className={styles.formLabel}>
+                            ملاحظات إضافية
+                        </label>
                         <textarea
+                            id="notes"
                             value={orderData.notes}
                             onChange={(e) => setOrderData({ ...orderData, notes: e.target.value })}
                             placeholder="أي ملاحظات خاصة بالطلب..."
-                            style={{
-                                width: '100%',
-                                padding: '10px',
-                                borderRadius: '5px',
-                                border: '1px solid #ddd',
-                                minHeight: '60px',
-                                fontSize: '16px',
-                                resize: 'vertical'
-                            }}
+                            className={styles.formTextarea}
+                            title="ملاحظات إضافية (اختيارية)"
                         />
                     </div>
                 </div>
@@ -356,19 +332,12 @@ export default function CheckoutPage() {
                 <button
                     type="submit"
                     disabled={loading}
-                    style={{
-                        backgroundColor: loading ? '#6c757d' : '#28a745',
-                        color: 'white',
-                        padding: '15px 30px',
-                        fontSize: '18px',
-                        border: 'none',
-                        borderRadius: '8px',
-                        cursor: loading ? 'not-allowed' : 'pointer',
-                        width: '100%',
-                        fontWeight: 'bold'
-                    }}
+                    className={`${styles.submitBtn} ${loading ? styles.submitBtnDisabled : ''}`}
                 >
-                    {loading ? 'جاري فحص المخزون وإرسال الطلب...' : `تأكيد الطلب (${getTotalPrice().toFixed(2)} ج.م)`}
+                    {loading
+                        ? 'جاري فحص المخزون وإرسال الطلب...'
+                        : `تأكيد الطلب (${getTotalPrice().toFixed(2)} ج.م)`
+                    }
                 </button>
             </form>
         </div>
