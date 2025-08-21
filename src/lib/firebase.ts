@@ -1,19 +1,21 @@
 // lib/firebase.ts
-import { initializeApp } from 'firebase/app';
-import { getAuth } from "firebase/auth";
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAO9NfsAKt40n4E3Mipq8IdOB9pvsxJUJI",
-  authDomain: "dana-socks.firebaseapp.com",
-  projectId: "dana-socks",
-  storageBucket: "dana-socks.appspot.com",  // ✅ التعديل هنا
-  messagingSenderId: "967973245549",
-  appId: "1:967973245549:web:7ac4a30b74822177c4e564",
-  measurementId: "G-PX23Z0V0QV"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID!,
 };
 
-const app = initializeApp(firebaseConfig);
+// ✅ نتأكد إن ما يحصلش إعادة تهيئة Firebase لو هو مهيأ أصلاً
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export default app;

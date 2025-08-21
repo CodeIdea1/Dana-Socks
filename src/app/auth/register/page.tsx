@@ -16,37 +16,70 @@ export default function RegisterPage() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [debugInfo, setDebugInfo] = useState(''); // لتتبع المشكلة
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        setDebugInfo('بدء عملية التسجيل...');
 
+        // التحقق من صحة البيانات
         if (password !== confirmPassword) {
             setError('كلمات المرور غير متطابقة');
+            setDebugInfo('');
             return;
         }
 
         if (password.length < 6) {
             setError('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+            setDebugInfo('');
             return;
         }
 
         setLoading(true);
 
         try {
+            setDebugInfo('جاري التحقق من Firebase...');
+
+            // التحقق من وجود Firebase
+            if (!auth) {
+                throw new Error('Firebase Auth غير مُعرَّف');
+            }
+
+            setDebugInfo('جاري إنشاء المستخدم...');
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // حفظ بيانات المستخدم في Firestore
-            await setDoc(doc(db, 'users', user.uid), {
-                email: user.email,
-                createdAt: new Date().toISOString(),
-            });
+            setDebugInfo('جاري حفظ بيانات المستخدم...');
 
-            router.push('/products');
+            // محاولة حفظ البيانات في Firestore (اختياري)
+            try {
+                if (db) {
+                    await setDoc(doc(db, 'users', user.uid), {
+                        email: user.email,
+                        createdAt: new Date().toISOString(),
+                    });
+                    setDebugInfo('تم حفظ البيانات في Firestore بنجاح');
+                }
+            } catch (firestoreError) {
+                console.warn('Failed to save to Firestore, but user account created:', firestoreError);
+                setDebugInfo('تم إنشاء الحساب بنجاح (بدون حفظ في قاعدة البيانات)');
+            }
+
+            // النجاح - التوجه إلى صفحة المنتجات
+            setDebugInfo('تم إنشاء الحساب بنجاح! جاري التحويل...');
+
+            // تأخير قصير لإظهار رسالة النجاح
+            setTimeout(() => {
+                router.push('/products');
+            }, 1000);
+
         } catch (err) {
             let errorMessage = 'حدث خطأ أثناء إنشاء الحساب';
+
+            console.error('Registration error details:', err);
+            setDebugInfo(`خطأ: ${err}`);
 
             if (err instanceof FirebaseError) {
                 switch (err.code) {
@@ -59,11 +92,20 @@ export default function RegisterPage() {
                     case 'auth/weak-password':
                         errorMessage = 'كلمة المرور ضعيفة جداً';
                         break;
+                    case 'auth/network-request-failed':
+                        errorMessage = 'مشكلة في الاتصال بالإنترنت';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'تم تجاوز حد المحاولات، حاول لاحقاً';
+                        break;
+                    default:
+                        errorMessage = `خطأ Firebase: ${err.code}`;
                 }
+            } else if (err instanceof Error) {
+                errorMessage = err.message;
             }
 
             setError(errorMessage);
-            console.error('Registration error:', err);
         } finally {
             setLoading(false);
         }
@@ -76,6 +118,12 @@ export default function RegisterPage() {
 
                 {error && <div className={styles.error}>{error}</div>}
 
+                {debugInfo && (
+                    <div className={styles.debug}>
+                        🔍 {debugInfo}
+                    </div>
+                )}
+
                 <form onSubmit={handleSubmit} className={styles.form}>
                     <div className={styles.inputGroup}>
                         <label htmlFor="email">البريد الإلكتروني</label>
@@ -86,11 +134,12 @@ export default function RegisterPage() {
                             onChange={(e) => setEmail(e.target.value)}
                             required
                             className={styles.input}
+                            disabled={loading}
                         />
                     </div>
 
                     <div className={styles.inputGroup}>
-                        <label htmlFor="password">كلمة المرور</label>
+                        <label htmlFor="password">كلمة المرور (6 أحرف على الأقل)</label>
                         <input
                             type="password"
                             id="password"
@@ -99,6 +148,7 @@ export default function RegisterPage() {
                             required
                             className={styles.input}
                             minLength={6}
+                            disabled={loading}
                         />
                     </div>
 
@@ -111,6 +161,7 @@ export default function RegisterPage() {
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required
                             className={styles.input}
+                            disabled={loading}
                         />
                     </div>
 
@@ -128,6 +179,16 @@ export default function RegisterPage() {
                         لديك حساب بالفعل؟{' '}
                         <Link href="/auth/login">تسجيل الدخول</Link>
                     </p>
+                </div>
+
+                {/* رسالة مساعدة */}
+                <div className={styles.helpText}>
+                    <p>💡 تأكد من:</p>
+                    <ul>
+                        <li>الاتصال بالإنترنت</li>
+                        <li>إعداد Firebase بشكل صحيح</li>
+                        <li>تفعيل Email Authentication في Firebase</li>
+                    </ul>
                 </div>
             </div>
         </div>
