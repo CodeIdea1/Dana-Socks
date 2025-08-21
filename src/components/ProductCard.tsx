@@ -11,7 +11,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     const { addToCart, addToWishlist, wishlistItems, cartItems } = useCart();
 
     const isInWishlist = wishlistItems.some(item => item.id === product.id);
-    const cartItem = cartItems.find(item => item.product.id === product.id);
+    const cartItem = cartItems.find(item => item.product?.id === product.id);
 
     const handleAddToCart = () => {
         addToCart(product);
