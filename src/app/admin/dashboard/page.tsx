@@ -37,12 +37,18 @@ interface Order {
     id: string;
     userId: string;
     customerInfo?: {
-        name?: string;
+        fullName?: string;
         email?: string;
         phone?: string;
         address?: string;
+        city?: string;
     };
-    items: any[];
+    items: Array<{
+        productName: string;
+        quantity: number;
+        price: number;
+        subtotal: number;
+    }>;
     totalAmount: number;
     status?: string;
     createdAt?: any;
@@ -52,6 +58,9 @@ interface Order {
 interface User {
     id: string;
     name?: string;
+    displayName?: string;
+    firstName?: string;
+    lastName?: string;
     email: string;
     createdAt?: any;
 }
@@ -90,6 +99,10 @@ export default function AdminDashboard() {
 
     // حالات تعديل المنتج
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+    // حالات عرض تفاصيل الطلب
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const [showOrderDetails, setShowOrderDetails] = useState<boolean>(false);
 
     // التحقق من صلاحيات الأدمن
     const isAdmin = user && ADMIN_EMAILS.includes(user.email || '');
@@ -132,6 +145,11 @@ export default function AdminDashboard() {
                 id: doc.id,
                 ...doc.data()
             } as User));
+
+            // طباعة البيانات للتشخيص
+            console.log('Users sample data:', usersData.slice(0, 2));
+            console.log('Users fields:', usersData[0] ? Object.keys(usersData[0]) : 'No users');
+
             setUsers(usersData);
 
         } catch (error) {
@@ -227,6 +245,11 @@ export default function AdminDashboard() {
             console.error('Error updating order status:', error);
             alert('حدث خطأ في تحديث الطلب');
         }
+    };
+
+    const handleViewOrderDetails = (order: Order): void => {
+        setSelectedOrder(order);
+        setShowOrderDetails(true);
     };
 
     const handleLogout = async (): Promise<void> => {
@@ -451,7 +474,7 @@ export default function AdminDashboard() {
                                                     <span className={styles.orderId}>#{order.id.substring(0, 8)}</span>
                                                 </td>
                                                 <td className={styles.tableCell}>
-                                                    {order.customerInfo?.name || 'غير محدد'}
+                                                    {order.customerInfo?.fullName || 'غير محدد'}
                                                 </td>
                                                 <td className={styles.tableCell}>
                                                     {order.totalAmount} ر.س
@@ -479,6 +502,7 @@ export default function AdminDashboard() {
                                                 </td>
                                                 <td className={styles.tableCell}>
                                                     <button
+                                                        onClick={() => handleViewOrderDetails(order)}
                                                         className={styles.viewButton}
                                                         aria-label={`عرض تفاصيل الطلب #{order.id.substring(0, 8)}`}
                                                     >
@@ -511,7 +535,11 @@ export default function AdminDashboard() {
                                         {users.map((user) => (
                                             <tr key={user.id} className={styles.tableRow}>
                                                 <td className={styles.tableCell}>
-                                                    {user.name || 'غير محدد'}
+                                                    {user.displayName ||
+                                                        user.name ||
+                                                        (user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : '') ||
+                                                        user.email?.split('@')[0] ||
+                                                        'غير محدد'}
                                                 </td>
                                                 <td className={styles.tableCell}>
                                                     {user.email}
@@ -736,6 +764,69 @@ export default function AdminDashboard() {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* نموذج عرض تفاصيل الطلب */}
+            {showOrderDetails && selectedOrder && (
+                <div className={styles.modal}>
+                    <div className={styles.modalContent}>
+                        <div className={styles.modalHeader}>
+                            <h3 className={styles.modalTitle}>
+                                تفاصيل الطلب #{selectedOrder.id.substring(0, 8)}
+                            </h3>
+                        </div>
+                        <div className={styles.orderDetailsContent}>
+                            <div className={styles.orderSection}>
+                                <h4>معلومات العميل:</h4>
+                                <p><strong>الاسم:</strong> {selectedOrder.customerInfo?.fullName || 'غير محدد'}</p>
+                                <p><strong>البريد:</strong> {selectedOrder.customerInfo?.email || 'غير محدد'}</p>
+                                <p><strong>الهاتف:</strong> {selectedOrder.customerInfo?.phone || 'غير محدد'}</p>
+                                <p><strong>المدينة:</strong> {selectedOrder.customerInfo?.city || 'غير محدد'}</p>
+                                <p><strong>العنوان:</strong> {selectedOrder.customerInfo?.address || 'غير محدد'}</p>
+                            </div>
+
+                            <div className={styles.orderSection}>
+                                <h4>المنتجات:</h4>
+                                {selectedOrder.items?.map((item: any, index: number) => (
+                                    <div key={index} className={styles.orderItem}>
+                                        <div className={styles.orderItemDetails}>
+                                            <span className={styles.itemName}>{item.productName}</span>
+                                            <span className={styles.itemQuantity}>الكمية: {item.quantity}</span>
+                                            <span className={styles.itemPrice}>السعر: {item.price} ر.س</span>
+                                            <span className={styles.itemSubtotal}>المجموع: {item.subtotal} ر.س</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className={styles.orderSection}>
+                                <div className={styles.orderSummary}>
+                                    <p><strong>المبلغ الإجمالي:</strong> {selectedOrder.totalAmount} ر.س</p>
+                                    <p><strong>الحالة:</strong> {
+                                        selectedOrder.status === 'pending' ? 'قيد الانتظار' :
+                                            selectedOrder.status === 'processing' ? 'قيد التجهيز' :
+                                                selectedOrder.status === 'shipped' ? 'تم الشحن' :
+                                                    selectedOrder.status === 'delivered' ? 'تم التوصيل' :
+                                                        selectedOrder.status === 'cancelled' ? 'ملغي' : 'غير محدد'
+                                    }</p>
+                                    <p><strong>تاريخ الطلب:</strong> {formatDate(selectedOrder.createdAt)}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className={styles.modalActions}>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setShowOrderDetails(false);
+                                    setSelectedOrder(null);
+                                }}
+                                className={styles.cancelButton}
+                            >
+                                إغلاق
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
