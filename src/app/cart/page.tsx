@@ -1,4 +1,5 @@
 'use client';
+
 // app/cart/page.tsx
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -45,9 +46,15 @@ export default function CartPage() {
 
             <div className={styles.cartContent}>
                 <div className={styles.cartItems}>
-                    {cartItems.map(item => (
-                        <CartItem key={item.product.id} item={item} />
-                    ))}
+                    {cartItems
+                        .filter(item => item.product) // Filter out items without product
+                        .map(item => (
+                            <CartItem
+                                key={item.product!.id}
+                                item={item}
+                            />
+                        ))
+                    }
                 </div>
 
                 <div className={styles.cartSummary}>

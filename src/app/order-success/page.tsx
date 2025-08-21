@@ -6,18 +6,29 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { useAuth } from '@/contexts/AuthContext';
 import styles from './order-success.module.css';
 
 interface OrderData {
     orderNumber: string;
     totalAmount: number;
+    orderDate: string;
     createdAt: string;
+    userId: string; // Add this line to fix the TypeScript error
     customerInfo: {
         fullName: string;
         phone: string;
         city: string;
         address: string;
+        email: string;
     };
+    items: Array<{
+        productName: string;
+        quantity: number;
+        price: number;
+        subtotal: number;
+    }>;
+    status: string;
 }
 
 export default function OrderSuccessPage() {
@@ -26,25 +37,45 @@ export default function OrderSuccessPage() {
     const [error, setError] = useState('');
     const searchParams = useSearchParams();
     const router = useRouter();
+    const { user, loading: authLoading } = useAuth();
     const orderId = searchParams.get('orderId');
 
     useEffect(() => {
+        // التأكد من تسجيل الدخول
+        if (!authLoading && !user) {
+            router.push('/auth/login');
+            return;
+        }
+
         if (!orderId) {
             router.push('/products');
             return;
         }
 
-        fetchOrderData();
-    }, [orderId]);
+        if (user && orderId) {
+            fetchOrderData();
+        }
+    }, [orderId, user, authLoading]);
 
     const fetchOrderData = async () => {
-        if (!orderId || !db) return;
+        if (!orderId || !db || !user) return;
 
         try {
             const orderDoc = await getDoc(doc(db, 'orders', orderId));
 
             if (orderDoc.exists()) {
-                setOrderData(orderDoc.data() as OrderData);
+                const data = orderDoc.data() as OrderData;
+
+                // التأكد من أن الطلب يخص المستخدم الحالي
+                if (data.userId !== user.uid) {
+                    setError('غير مسموح بالوصول لهذا الطلب');
+                    return;
+                }
+
+                setOrderData({
+                    ...data,
+                    orderNumber: orderId
+                });
             } else {
                 setError('لم يتم العثور على الطلب');
             }
@@ -55,6 +86,30 @@ export default function OrderSuccessPage() {
             setLoading(false);
         }
     };
+
+    // عرض التحميل أثناء فحص حالة المصادقة
+    if (authLoading) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.loading}>جاري التحميل...</div>
+            </div>
+        );
+    }
+
+    // إذا لم يكن المستخدم مسجل دخول
+    if (!user) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.error}>
+                    <h2>يجب تسجيل الدخول</h2>
+                    <p>يجب تسجيل الدخول لعرض تفاصيل الطلب</p>
+                    <Link href="/auth/login" className={styles.button}>
+                        تسجيل الدخول
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     if (loading) {
         return (
@@ -87,7 +142,7 @@ export default function OrderSuccessPage() {
                     <h1 className={styles.title}>تم إرسال طلبك بنجاح!</h1>
 
                     <p className={styles.message}>
-                        شكراً لك! لقد تم استلام طلبك وسيتم التواصل معك قريباً لتأكيد التوصيل.
+                        شكراً لك {orderData?.customerInfo?.fullName}! لقد تم استلام طلبك وسيتم التواصل معك قريباً لتأكيد التوصيل.
                     </p>
 
                     {orderData && (
@@ -107,7 +162,14 @@ export default function OrderSuccessPage() {
                             <div className={styles.detail}>
                                 <span className={styles.label}>تاريخ الطلب:</span>
                                 <span className={styles.value}>
-                                    {new Date(orderData.createdAt).toLocaleDateString('ar-EG')}
+                                    {new Date(orderData.orderDate || orderData.createdAt).toLocaleDateString('ar-EG')}
+                                </span>
+                            </div>
+
+                            <div className={styles.detail}>
+                                <span className={styles.label}>حالة الطلب:</span>
+                                <span className={styles.value}>
+                                    {orderData.status === 'pending' ? 'قيد المراجعة' : orderData.status}
                                 </span>
                             </div>
 
@@ -122,11 +184,29 @@ export default function OrderSuccessPage() {
                             </div>
 
                             <div className={styles.detail}>
+                                <span className={styles.label}>البريد الإلكتروني:</span>
+                                <span className={styles.value}>{orderData.customerInfo.email}</span>
+                            </div>
+
+                            <div className={styles.detail}>
                                 <span className={styles.label}>عنوان التوصيل:</span>
                                 <span className={styles.value}>
                                     {orderData.customerInfo.address}, {orderData.customerInfo.city}
                                 </span>
                             </div>
+
+                            {/* عرض المنتجات المطلوبة */}
+                            {orderData.items && orderData.items.length > 0 && (
+                                <div className={styles.orderItems}>
+                                    <h3>المنتجات المطلوبة:</h3>
+                                    {orderData.items.map((item, index) => (
+                                        <div key={index} className={styles.orderItem}>
+                                            <span>{item.productName} × {item.quantity}</span>
+                                            <span>{item.subtotal} ج.م</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -145,7 +225,7 @@ export default function OrderSuccessPage() {
                             متابعة التسوق
                         </Link>
 
-                        <Link href="/profile" className={styles.buttonSecondary}>
+                        <Link href="/orders" className={styles.buttonSecondary}>
                             عرض طلباتي
                         </Link>
                     </div>

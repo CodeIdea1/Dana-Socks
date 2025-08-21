@@ -13,8 +13,15 @@ export interface Product {
 }
 
 export interface CartItem {
-    product: Product;
+    id: string;
+    name: string;
+    price: number;
+    imageUrl: string;
+    description: string;
+    stock: number;
+    category: string;
     quantity: number;
+    product?: Product; // للتوافق مع الكود الحالي
 }
 
 interface CartContextType {
@@ -49,44 +56,72 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Load from localStorage on component mount
     useEffect(() => {
-        const savedCart = localStorage.getItem('cart');
-        const savedWishlist = localStorage.getItem('wishlist');
+        if (typeof window !== 'undefined') {
+            const savedCart = localStorage.getItem('cart');
+            const savedWishlist = localStorage.getItem('wishlist');
 
-        if (savedCart) {
-            setCartItems(JSON.parse(savedCart));
-        }
+            if (savedCart) {
+                try {
+                    setCartItems(JSON.parse(savedCart));
+                } catch (error) {
+                    console.error('Error parsing cart from localStorage:', error);
+                }
+            }
 
-        if (savedWishlist) {
-            setWishlistItems(JSON.parse(savedWishlist));
+            if (savedWishlist) {
+                try {
+                    setWishlistItems(JSON.parse(savedWishlist));
+                } catch (error) {
+                    console.error('Error parsing wishlist from localStorage:', error);
+                }
+            }
         }
     }, []);
 
     // Save to localStorage whenever cart changes
     useEffect(() => {
-        localStorage.setItem('cart', JSON.stringify(cartItems));
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('cart', JSON.stringify(cartItems));
+        }
     }, [cartItems]);
 
     // Save to localStorage whenever wishlist changes
     useEffect(() => {
-        localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
+        }
     }, [wishlistItems]);
 
     const addToCart = (product: Product) => {
         setCartItems(prev => {
-            const existingItem = prev.find(item => item.product.id === product.id);
+            const existingItem = prev.find(item => item.id === product.id);
             if (existingItem) {
                 return prev.map(item =>
-                    item.product.id === product.id
+                    item.id === product.id
                         ? { ...item, quantity: item.quantity + 1 }
                         : item
                 );
             }
-            return [...prev, { product, quantity: 1 }];
+
+            // إضافة المنتج كـ CartItem مع كل البيانات اللازمة
+            const newCartItem: CartItem = {
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                imageUrl: product.imageUrl,
+                description: product.description,
+                stock: product.stock,
+                category: product.category,
+                quantity: 1,
+                product: product // للتوافق مع الكود الحالي
+            };
+
+            return [...prev, newCartItem];
         });
     };
 
     const removeFromCart = (productId: string) => {
-        setCartItems(prev => prev.filter(item => item.product.id !== productId));
+        setCartItems(prev => prev.filter(item => item.id !== productId));
     };
 
     const updateQuantity = (productId: string, quantity: number) => {
@@ -97,7 +132,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
         setCartItems(prev =>
             prev.map(item =>
-                item.product.id === productId
+                item.id === productId
                     ? { ...item, quantity }
                     : item
             )
@@ -118,7 +153,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     const getTotalPrice = () => {
-        return cartItems.reduce((total, item) => total + (item.product.price * item.quantity), 0);
+        return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     };
 
     const clearCart = () => {
