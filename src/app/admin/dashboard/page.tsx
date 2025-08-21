@@ -1,5 +1,6 @@
 // app/admin/dashboard/page.tsx
 'use client';
+import { Timestamp } from "firebase/firestore";
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -263,15 +264,18 @@ export default function AdminDashboard() {
 
     const formatDate = (timestamp: any): string => {
         try {
-            if (timestamp?.toDate) {
-                return timestamp.toDate().toLocaleDateString('ar-EG');
+            if (timestamp instanceof Timestamp) {
+                return timestamp.toDate().toLocaleString('ar-EG');
+            }
+            const date = new Date(timestamp);
+            if (!isNaN(date.getTime())) {
+                return date.toLocaleString('ar-EG');
             }
             return 'غير محدد';
         } catch {
             return 'غير محدد';
         }
     };
-
     if (loading || isLoading) {
         return (
             <div className={styles.loadingContainer}>
