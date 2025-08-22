@@ -21,44 +21,76 @@ export default function ProductCard({ product }: ProductCardProps) {
         addToWishlist(product);
     };
 
-    // إضافة console.log للتشخيص
-    console.log('ProductCard rendering with image:', {
-        productId: product.id,
-        productName: product.name,
-        imageUrl: product.imageUrl,
-        hasImage: !!product.imageUrl
-    });
+    // تنظيف وفحص رابط الصورة
+    const getImageUrl = (url: string | undefined): string => {
+        if (!url || url.trim() === '') {
+            return '/placeholder.png';
+        }
+
+        // إزالة المسافات الزائدة
+        const cleanUrl = url.trim();
+
+        // التحقق من صحة الرابط
+        try {
+            new URL(cleanUrl);
+            return cleanUrl;
+        } catch {
+            console.warn('Invalid URL:', url);
+            return '/placeholder.png';
+        }
+    };
+
+    const imageUrl = getImageUrl(product.imageUrl);
 
     const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-        console.error('Image failed to load:', product.imageUrl);
-        // يمكنك إضافة صورة افتراضية هنا إذا أردت
-        // e.currentTarget.src = '/default-product-image.jpg';
+        console.error('Image failed to load:', imageUrl);
+        console.error('Product details:', {
+            id: product.id,
+            name: product.name,
+            originalImageUrl: product.imageUrl
+        });
+
+        // استخدام صورة احتياطية
+        const target = e.target as HTMLImageElement;
+        target.src = '/placeholder.png';
+
+        // إذا فشلت الصورة الاحتياطية أيضاً، إخفاء الصورة
+        target.onerror = () => {
+            target.style.display = 'none';
+            console.error('Fallback image also failed');
+        };
     };
 
     const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-        console.log('Image loaded successfully:', product.imageUrl);
+        console.log('✅ Image loaded successfully:', imageUrl);
+        const target = e.target as HTMLImageElement;
+        target.style.opacity = '1';
     };
 
     return (
         <div className={styles.card}>
             <div className={styles.imageContainer}>
-                {product.imageUrl ? (
-                    <img
-                        src={product.imageUrl}
-                        alt={product.name}
-                        className={styles.image}
-                        onError={handleImageError}
-                        onLoad={handleImageLoad}
-                        loading="lazy"
-                    />
-                ) : (
-                    <div className={styles.noImagePlaceholder}>
-                        <span>لا توجد صورة</span>
-                    </div>
-                )}
+                <img
+                    src={imageUrl}
+                    alt={product.name || 'منتج'}
+                    className={styles.image}
+                    onError={handleImageError}
+                    onLoad={handleImageLoad}
+                    loading="lazy"
+                    style={{
+                        opacity: '0',
+                        transition: 'opacity 0.3s ease',
+                        objectFit: 'cover',
+                        width: '100%',
+                        height: '100%'
+                    }}
+                    // إضافة crossOrigin للتعامل مع الروابط الخارجية
+                    crossOrigin="anonymous"
+                />
                 <button
                     className={`${styles.wishlistBtn} ${isInWishlist ? styles.active : ''}`}
                     onClick={handleAddToWishlist}
+                    aria-label={isInWishlist ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}
                 >
                     ♥
                 </button>

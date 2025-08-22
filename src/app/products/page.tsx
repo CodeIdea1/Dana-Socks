@@ -22,6 +22,13 @@ export default function ProductsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
+    // دالة تنظيف رابط الصورة
+    const cleanImageUrl = (url: string | undefined): string => {
+        if (!url) return '';
+        const cleaned = url.toString().trim();
+        return cleaned;
+    };
+
     useEffect(() => {
         const fetchFirebaseProducts = async () => {
             try {
@@ -44,16 +51,28 @@ export default function ProductsPage() {
 
                 const productsList = productsSnapshot.docs.map(doc => {
                     const data = doc.data();
-                    return {
+
+                    const product = {
                         category: data.category || 'غير مصنف',
                         createdAt: data.createdAt || '',
                         description: data.description || '',
                         id: doc.id,
-                        imageUrl: data.imageUrl || '/https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUiouPTRrsa1YqBlA6IatM4nBydTclYYVF2w&s',
+                        // التعامل مع كل من imageUrl و image القديم
+                        imageUrl: cleanImageUrl(data.imageUrl) || cleanImageUrl(data.image) || '',
                         name: data.name || 'غير محدد',
                         price: Number(data.price) || 0,
                         stock: Number(data.stock) || 0,
                     } as Product;
+
+                    // طباعة معلومات المنتج للتشخيص
+                    console.log('Product loaded:', {
+                        id: product.id,
+                        name: product.name,
+                        imageUrl: product.imageUrl,
+                        hasValidImage: !!product.imageUrl && product.imageUrl.length > 0
+                    });
+
+                    return product;
                 });
 
                 // فلترة المنتجات المتوفرة فقط (اختياري)
