@@ -1,4 +1,4 @@
-// app/admin/dashboard/page.tsx
+// app/admin / dashboard / page.tsx
 'use client';
 import { Timestamp } from "firebase/firestore";
 
@@ -14,7 +14,8 @@ import {
     serverTimestamp,
     query,
     orderBy,
-    DocumentData
+    DocumentData,
+    where
 } from 'firebase/firestore';
 import { auth, db } from '../../../lib/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -27,7 +28,7 @@ interface Product {
     name: string;
     price: number;
     description?: string;
-    imageUrl?: string; // تم تغيير image إلى imageUrl
+    imageUrl?: string;
     category?: string;
     stock: number;
     createdAt?: any;
@@ -70,13 +71,18 @@ interface NewProductForm {
     name: string;
     price: string;
     description: string;
-    imageUrl: string; // تم تغيير image إلى imageUrl
+    imageUrl: string;
     category: string;
     stock: string;
 }
 
-
-const ADMIN_EMAILS = ['sajaahmed1007@gmail.com', 'sajaahmed1007@gmail.com']; // ضع إيميلات الأدمن هنا
+interface AdminUser {
+    id: string;
+    email: string;
+    role: string;
+    createdAt?: any;
+    isActive?: boolean;
+}
 
 export default function AdminDashboard() {
     const [user, loading, error] = useAuthState(auth);
@@ -86,6 +92,8 @@ export default function AdminDashboard() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [users, setUsers] = useState<User[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isAdmin, setIsAdmin] = useState<boolean>(false);
+    const [adminCheckComplete, setAdminCheckComplete] = useState<boolean>(false);
 
     // حالات إضافة منتج جديد
     const [showAddProduct, setShowAddProduct] = useState<boolean>(false);
@@ -93,7 +101,7 @@ export default function AdminDashboard() {
         name: '',
         price: '',
         description: '',
-        imageUrl: '', // تم تغيير image إلى imageUrl
+        imageUrl: '',
         category: '',
         stock: ''
     });
@@ -105,19 +113,66 @@ export default function AdminDashboard() {
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [showOrderDetails, setShowOrderDetails] = useState<boolean>(false);
 
-    // التحقق من صلاحيات الأدمن
-    const isAdmin = user && ADMIN_EMAILS.includes(user.email || '');
+    // التحقق من صلاحيات الأدمن من Firestore
+    const checkAdminPermissions = async (userEmail: string): Promise<boolean> => {
+        try {
+            const adminsQuery = query(
+                collection(db, 'admins'),
+                where('email', '==', userEmail),
+                where('isActive', '==', true)
+            );
+            const adminsSnapshot = await getDocs(adminsQuery);
+
+            if (adminsSnapshot.empty) {
+                console.log('المستخدم غير موجود في قائمة الأدمنات أو غير مفعل');
+                return false;
+            }
+
+            // التحقق من وجود مستند واحد على الأقل
+            const adminDoc = adminsSnapshot.docs[0];
+            const adminData = adminDoc.data() as AdminUser;
+
+            console.log('تم العثور على مستخدم أدمن:', adminData);
+            return adminData.role === 'admin' || adminData.role === 'owner';
+        } catch (error) {
+            console.error('خطأ في التحقق من صلاحيات الأدمن:', error);
+            return false;
+        }
+    };
 
     useEffect(() => {
-        if (!loading && (!user || !isAdmin)) {
-            router.push('/');
-            return;
-        }
+        const initializeAdminCheck = async () => {
+            if (loading) return;
 
-        if (isAdmin) {
-            fetchData();
-        }
-    }, [user, loading, isAdmin, router]);
+            if (!user || !user.email) {
+                setIsAdmin(false);
+                setAdminCheckComplete(true);
+                router.push('/');
+                return;
+            }
+
+            try {
+                const adminStatus = await checkAdminPermissions(user.email);
+                setIsAdmin(adminStatus);
+
+                if (!adminStatus) {
+                    console.log('المستخدم ليس أدمن، سيتم توجيهه للصفحة الرئيسية');
+                    router.push('/');
+                } else {
+                    console.log('تم التحقق من صلاحيات الأدمن بنجاح');
+                    fetchData();
+                }
+            } catch (error) {
+                console.error('خطأ في تهيئة فحص الأدمن:', error);
+                setIsAdmin(false);
+                router.push('/');
+            } finally {
+                setAdminCheckComplete(true);
+            }
+        };
+
+        initializeAdminCheck();
+    }, [user, loading, router]);
 
     const fetchData = async (): Promise<void> => {
         try {
@@ -132,7 +187,6 @@ export default function AdminDashboard() {
                     name: data.name,
                     price: data.price,
                     description: data.description,
-                    // التعامل مع الحقول القديمة والجديدة للصور
                     imageUrl: data.imageUrl || data.image || '',
                     category: data.category,
                     stock: data.stock,
@@ -158,7 +212,6 @@ export default function AdminDashboard() {
                 ...doc.data()
             } as User));
 
-            // طباعة البيانات للتشخيص
             console.log('Users sample data:', usersData.slice(0, 2));
             console.log('Users fields:', usersData[0] ? Object.keys(usersData[0]) : 'No users');
 
@@ -179,7 +232,7 @@ export default function AdminDashboard() {
                 name: newProduct.name,
                 price: parseFloat(newProduct.price),
                 description: newProduct.description,
-                imageUrl: newProduct.imageUrl, // تم تغيير image إلى imageUrl
+                imageUrl: newProduct.imageUrl,
                 category: newProduct.category,
                 stock: parseInt(newProduct.stock),
                 createdAt: serverTimestamp()
@@ -191,7 +244,7 @@ export default function AdminDashboard() {
                 name: '',
                 price: '',
                 description: '',
-                imageUrl: '', // تم تغيير image إلى imageUrl
+                imageUrl: '',
                 category: '',
                 stock: ''
             });
@@ -214,7 +267,7 @@ export default function AdminDashboard() {
                 name: editingProduct.name,
                 price: editingProduct.price,
                 description: editingProduct.description,
-                imageUrl: editingProduct.imageUrl, // تم تغيير image إلى imageUrl
+                imageUrl: editingProduct.imageUrl,
                 category: editingProduct.category,
                 stock: editingProduct.stock,
                 updatedAt: serverTimestamp()
@@ -287,7 +340,9 @@ export default function AdminDashboard() {
             return 'غير محدد';
         }
     };
-    if (loading || isLoading) {
+
+    // عرض شاشة التحميل أثناء التحقق من الصلاحيات
+    if (loading || !adminCheckComplete || (isAdmin && isLoading)) {
         return (
             <div className={styles.loadingContainer}>
                 <div className={styles.spinner}></div>
@@ -295,12 +350,19 @@ export default function AdminDashboard() {
         );
     }
 
+    // عرض رسالة عدم الصلاحية
     if (!isAdmin) {
         return (
             <div className={styles.unauthorizedContainer}>
                 <div className={styles.unauthorizedContent}>
                     <h1 className={styles.unauthorizedTitle}>غير مصرح لك بالدخول</h1>
                     <p className={styles.unauthorizedText}>ليس لديك صلاحيات للوصول إلى لوحة الإدارة</p>
+                    <button
+                        onClick={() => router.push('/')}
+                        className={styles.backButton}
+                    >
+                        العودة للصفحة الرئيسية
+                    </button>
                 </div>
             </div>
         );
