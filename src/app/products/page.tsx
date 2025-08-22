@@ -6,6 +6,17 @@ import { Product } from '@/contexts/CartContext';
 import ProductCard from '@/components/ProductCard';
 import styles from './products.module.css';
 
+// استيراد Swiper وmodules
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Scrollbar, A11y, FreeMode, Mousewheel } from 'swiper/modules';
+
+// استيراد CSS الخاص بـ Swiper
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/scrollbar';
+import 'swiper/css/free-mode';
+
 export default function ProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
@@ -108,13 +119,81 @@ export default function ProductsPage() {
             )}
 
             {products.length > 0 && (
-                <div className={styles.productsGrid}>
-                    {products.map(product => (
-                        <ProductCard
-                            key={product.id}
-                            product={product}
-                        />
-                    ))}
+                <div className={styles.swiperContainer}>
+                    <Swiper
+                        modules={[Navigation, Pagination, Scrollbar, A11y, FreeMode, Mousewheel]}
+                        spaceBetween={20}
+                        slidesPerView="auto"
+                        freeMode={true}
+                        mousewheel={true}
+                        grabCursor={true}
+                        navigation={{
+                            nextEl: '.swiper-button-next',
+                            prevEl: '.swiper-button-prev',
+                        }}
+                        pagination={{
+                            el: '.swiper-pagination',
+                            clickable: true,
+                            dynamicBullets: true,
+                        }}
+                        scrollbar={{
+                            el: '.swiper-scrollbar',
+                            draggable: true,
+                        }}
+                        breakpoints={{
+                            320: {
+                                slidesPerView: 1,
+                                spaceBetween: 10,
+                            },
+                            480: {
+                                slidesPerView: 1.5,
+                                spaceBetween: 15,
+                            },
+                            768: {
+                                slidesPerView: 2.5,
+                                spaceBetween: 20,
+                            },
+                            1024: {
+                                slidesPerView: 3.5,
+                                spaceBetween: 25,
+                            },
+                            1200: {
+                                slidesPerView: 4,
+                                spaceBetween: 30,
+                            },
+                        }}
+                        className={styles.productsSwiper}
+                    >
+                        {products.map(product => (
+                            <SwiperSlide key={product.id} className={styles.swiperSlide}>
+                                <ProductCard product={product} />
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
+
+                    {/* أزرار التنقل المخصصة */}
+                    <div className="swiper-button-prev" style={{
+                        color: '#007bff',
+                        left: '10px',
+                        zIndex: 10,
+                    }}></div>
+                    <div className="swiper-button-next" style={{
+                        color: '#007bff',
+                        right: '10px',
+                        zIndex: 10,
+                    }}></div>
+
+                    {/* النقاط التفاعلية */}
+                    <div className="swiper-pagination" style={{
+                        bottom: '-40px',
+                    }}></div>
+
+                    {/* شريط التمرير */}
+                    <div className="swiper-scrollbar" style={{
+                        bottom: '-60px',
+                        background: '#f0f0f0',
+                        height: '4px',
+                    }}></div>
                 </div>
             )}
 
