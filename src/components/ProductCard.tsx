@@ -21,14 +21,41 @@ export default function ProductCard({ product }: ProductCardProps) {
         addToWishlist(product);
     };
 
+    // إضافة console.log للتشخيص
+    console.log('ProductCard rendering with image:', {
+        productId: product.id,
+        productName: product.name,
+        imageUrl: product.imageUrl,
+        hasImage: !!product.imageUrl
+    });
+
+    const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+        console.error('Image failed to load:', product.imageUrl);
+        // يمكنك إضافة صورة افتراضية هنا إذا أردت
+        // e.currentTarget.src = '/default-product-image.jpg';
+    };
+
+    const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+        console.log('Image loaded successfully:', product.imageUrl);
+    };
+
     return (
         <div className={styles.card}>
             <div className={styles.imageContainer}>
-                <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    className={styles.image}
-                />
+                {product.imageUrl ? (
+                    <img
+                        src={product.imageUrl}
+                        alt={product.name}
+                        className={styles.image}
+                        onError={handleImageError}
+                        onLoad={handleImageLoad}
+                        loading="lazy"
+                    />
+                ) : (
+                    <div className={styles.noImagePlaceholder}>
+                        <span>لا توجد صورة</span>
+                    </div>
+                )}
                 <button
                     className={`${styles.wishlistBtn} ${isInWishlist ? styles.active : ''}`}
                     onClick={handleAddToWishlist}
