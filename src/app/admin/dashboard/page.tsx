@@ -91,6 +91,7 @@ export default function AdminDashboard() {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [newAdminEmail, setNewAdminEmail] = useState<string>('');
     const [adminMessage, setAdminMessage] = useState<string>('');
+    const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
     // حالات إضافة منتج جديد
     const [showAddProduct, setShowAddProduct] = useState<boolean>(false);
@@ -111,21 +112,47 @@ export default function AdminDashboard() {
     const [showOrderDetails, setShowOrderDetails] = useState<boolean>(false);
 
     // التحقق من صلاحيات الأدمن
-    const isUserAdmin = () => {
+    const checkUserAdmin = async () => {
         if (!user?.email) return false;
-        return STATIC_ADMIN_EMAILS.includes(user.email) ||
-            admins.some(admin => admin.email === user.email);
+
+        // التحقق من البريد الإلكتروني للمسؤولين الثابتين
+        if (STATIC_ADMIN_EMAILS.includes(user.email)) {
+            setIsAdmin(true);
+            return true;
+        }
+
+        // التحقق من مجموعة admins في Firestore
+        try {
+            const adminsQuery = query(collection(db, 'admins'), where('email', '==', user.email));
+            const adminsSnapshot = await getDocs(adminsQuery);
+
+            if (!adminsSnapshot.empty) {
+                setIsAdmin(true);
+                return true;
+            }
+
+            setIsAdmin(false);
+            return false;
+        } catch (error) {
+            console.error('Error checking admin status:', error);
+            setIsAdmin(false);
+            return false;
+        }
     };
 
     useEffect(() => {
-        if (!loading && (!user || !isUserAdmin())) {
-            router.push('/');
-            return;
-        }
+        const verifyAdmin = async () => {
+            if (!loading && user) {
+                const adminStatus = await checkUserAdmin();
+                if (!adminStatus) {
+                    router.push('/');
+                    return;
+                }
+                fetchData();
+            }
+        };
 
-        if (user && isUserAdmin()) {
-            fetchData();
-        }
+        verifyAdmin();
     }, [user, loading]);
 
     const fetchData = async (): Promise<void> => {
@@ -197,16 +224,12 @@ export default function AdminDashboard() {
             return;
         }
 
-        // التحقق إذا كان المستخدم موجوداً في قاعدة البيانات
-        const userQuery = query(collection(db, 'users'), where('email', '==', newAdminEmail));
-        const userSnapshot = await getDocs(userQuery);
-
-        if (userSnapshot.empty) {
-            setAdminMessage('المستخدم غير موجود في النظام');
+        // التحقق من صحة البريد الإلكتروني
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(newAdminEmail)) {
+            setAdminMessage('يرجى إدخال بريد إلكتروني صحيح');
             return;
         }
-
-        const userData = userSnapshot.docs[0].data() as User;
 
         // التحقق إذا كان المستخدم مسؤولاً بالفعل
         const isAlreadyAdmin = admins.some(admin => admin.email === newAdminEmail) ||
@@ -218,11 +241,25 @@ export default function AdminDashboard() {
         }
 
         try {
+            // التحقق إذا كان المستخدم موجوداً في قاعدة البيانات
+            const userQuery = query(collection(db, 'users'), where('email', '==', newAdminEmail));
+            const userSnapshot = await getDocs(userQuery);
+
+            let userName = newAdminEmail.split('@')[0]; // اسم افتراضي من البريد الإلكتروني
+
+            if (!userSnapshot.empty) {
+                const userData = userSnapshot.docs[0].data() as User;
+                userName = userData.name || userData.displayName ||
+                    `${userData.firstName || ''} ${userData.lastName || ''}`.trim() ||
+                    newAdminEmail.split('@')[0];
+            }
+
             // إضافة المستخدم إلى مجموعة admins
             await addDoc(collection(db, 'admins'), {
                 email: newAdminEmail,
-                name: userData.name || userData.displayName || `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
-                createdAt: serverTimestamp()
+                name: userName,
+                createdAt: serverTimestamp(),
+                addedBy: user?.email
             });
 
             setAdminMessage('تمت إضافة المسؤول بنجاح');
@@ -230,7 +267,7 @@ export default function AdminDashboard() {
             fetchData(); // تحديث البيانات
         } catch (error) {
             console.error('Error adding admin:', error);
-            setAdminMessage('حدث خطأ أثناء إضافة المسؤول');
+            setAdminMessage('حدث خطأ أثناء إضافة المسؤول. تأكد من صحة البريد الإلكتروني.');
         }
     };
 
@@ -376,7 +413,7 @@ export default function AdminDashboard() {
         );
     }
 
-    if (!isUserAdmin()) {
+    if (!isAdmin) {
         return (
             <div className={styles.unauthorizedContainer}>
                 <div className={styles.unauthorizedContent}>
@@ -694,7 +731,7 @@ export default function AdminDashboard() {
                                             إضافة مسؤول
                                         </button>
                                     </div>
-                                    {adminMessage && <p className={styles.message}>{adminMessage}</p>}
+                                    {adminMessage && <p className={adminMessage.includes('خطأ') ? styles.errorMessage : styles.successMessage}>{adminMessage}</p>}
                                 </div>
 
                                 <div className={styles.adminsList}>
