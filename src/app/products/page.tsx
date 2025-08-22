@@ -44,14 +44,19 @@ export default function ProductsPage() {
 
                 const productsList = productsSnapshot.docs.map(doc => {
                     const data = doc.data();
+                    console.log(`Product ${doc.id}:`, {
+                        name: data.name,
+                        imageUrl: data.imageUrl,
+                        hasImageUrl: !!data.imageUrl
+                    });
+
                     return {
                         category: data.category || 'غير مصنف',
                         createdAt: data.createdAt || '',
                         description: data.description || '',
                         id: doc.id,
-                        imageUrl: data.imageUrl
-                            ? data.imageUrl
-                            : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUiouPTRrsa1YqBlA6IatM4nBydTclYYVF2w&s',
+                        // استخدم الصورة المحفوظة في الداش بورد فقط
+                        imageUrl: data.imageUrl,
                         name: data.name || 'غير محدد',
                         price: Number(data.price) || 0,
                         stock: Number(data.stock) || 0,
