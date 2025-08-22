@@ -1,4 +1,4 @@
-// app/admin / dashboard / page.tsx
+// app/admin/dashboard/page.tsx
 'use client';
 import { Timestamp } from "firebase/firestore";
 
@@ -28,7 +28,7 @@ interface Product {
     name: string;
     price: number;
     description?: string;
-    imageUrl?: string;
+    imageUrl?: string; // تم تغيير image إلى imageUrl
     category?: string;
     stock: number;
     createdAt?: any;
@@ -65,35 +65,32 @@ interface User {
     lastName?: string;
     email: string;
     createdAt?: any;
+    isAdmin?: boolean;
 }
 
 interface NewProductForm {
     name: string;
     price: string;
     description: string;
-    imageUrl: string;
+    imageUrl: string; // تم تغيير image إلى imageUrl
     category: string;
     stock: string;
 }
 
-interface AdminUser {
-    id: string;
-    email: string;
-    role: string;
-    createdAt?: any;
-    isActive?: boolean;
-}
+// قائمة البريد الإلكتروني للمسؤولين الثابتين
+const STATIC_ADMIN_EMAILS = ['sajaahmed1007@gmail.com', 'sajaahmed1007@gmail.com']; // ضع إيميلات الأدمن هنا
 
 export default function AdminDashboard() {
     const [user, loading, error] = useAuthState(auth);
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'users'>('products');
+    const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'users' | 'admins'>('products');
     const [products, setProducts] = useState<Product[]>([]);
     const [orders, setOrders] = useState<Order[]>([]);
     const [users, setUsers] = useState<User[]>([]);
+    const [admins, setAdmins] = useState<User[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [isAdmin, setIsAdmin] = useState<boolean>(false);
-    const [adminCheckComplete, setAdminCheckComplete] = useState<boolean>(false);
+    const [newAdminEmail, setNewAdminEmail] = useState<string>('');
+    const [adminMessage, setAdminMessage] = useState<string>('');
 
     // حالات إضافة منتج جديد
     const [showAddProduct, setShowAddProduct] = useState<boolean>(false);
@@ -101,7 +98,7 @@ export default function AdminDashboard() {
         name: '',
         price: '',
         description: '',
-        imageUrl: '',
+        imageUrl: '', // تم تغيير image إلى imageUrl
         category: '',
         stock: ''
     });
@@ -113,66 +110,23 @@ export default function AdminDashboard() {
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [showOrderDetails, setShowOrderDetails] = useState<boolean>(false);
 
-    // التحقق من صلاحيات الأدمن من Firestore
-    const checkAdminPermissions = async (userEmail: string): Promise<boolean> => {
-        try {
-            const adminsQuery = query(
-                collection(db, 'admins'),
-                where('email', '==', userEmail),
-                where('isActive', '==', true)
-            );
-            const adminsSnapshot = await getDocs(adminsQuery);
-
-            if (adminsSnapshot.empty) {
-                console.log('المستخدم غير موجود في قائمة الأدمنات أو غير مفعل');
-                return false;
-            }
-
-            // التحقق من وجود مستند واحد على الأقل
-            const adminDoc = adminsSnapshot.docs[0];
-            const adminData = adminDoc.data() as AdminUser;
-
-            console.log('تم العثور على مستخدم أدمن:', adminData);
-            return adminData.role === 'admin' || adminData.role === 'owner';
-        } catch (error) {
-            console.error('خطأ في التحقق من صلاحيات الأدمن:', error);
-            return false;
-        }
+    // التحقق من صلاحيات الأدمن
+    const isUserAdmin = () => {
+        if (!user?.email) return false;
+        return STATIC_ADMIN_EMAILS.includes(user.email) ||
+            admins.some(admin => admin.email === user.email);
     };
 
     useEffect(() => {
-        const initializeAdminCheck = async () => {
-            if (loading) return;
+        if (!loading && (!user || !isUserAdmin())) {
+            router.push('/');
+            return;
+        }
 
-            if (!user || !user.email) {
-                setIsAdmin(false);
-                setAdminCheckComplete(true);
-                router.push('/');
-                return;
-            }
-
-            try {
-                const adminStatus = await checkAdminPermissions(user.email);
-                setIsAdmin(adminStatus);
-
-                if (!adminStatus) {
-                    console.log('المستخدم ليس أدمن، سيتم توجيهه للصفحة الرئيسية');
-                    router.push('/');
-                } else {
-                    console.log('تم التحقق من صلاحيات الأدمن بنجاح');
-                    fetchData();
-                }
-            } catch (error) {
-                console.error('خطأ في تهيئة فحص الأدمن:', error);
-                setIsAdmin(false);
-                router.push('/');
-            } finally {
-                setAdminCheckComplete(true);
-            }
-        };
-
-        initializeAdminCheck();
-    }, [user, loading, router]);
+        if (user && isUserAdmin()) {
+            fetchData();
+        }
+    }, [user, loading]);
 
     const fetchData = async (): Promise<void> => {
         try {
@@ -187,6 +141,7 @@ export default function AdminDashboard() {
                     name: data.name,
                     price: data.price,
                     description: data.description,
+                    // التعامل مع الحقول القديمة والجديدة للصور
                     imageUrl: data.imageUrl || data.image || '',
                     category: data.category,
                     stock: data.stock,
@@ -212,16 +167,88 @@ export default function AdminDashboard() {
                 ...doc.data()
             } as User));
 
+            // طباعة البيانات للتشخيص
             console.log('Users sample data:', usersData.slice(0, 2));
             console.log('Users fields:', usersData[0] ? Object.keys(usersData[0]) : 'No users');
 
             setUsers(usersData);
+
+            // جلب المسؤولين من مجموعة admins
+            const adminsQuery = query(collection(db, 'admins'));
+            const adminsSnapshot = await getDocs(adminsQuery);
+            const adminsData: User[] = adminsSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            } as User));
+            setAdmins(adminsData);
 
         } catch (error) {
             console.error('Error fetching data:', error);
             alert('حدث خطأ في تحميل البيانات');
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    // إضافة مسؤول جديد
+    const addAdmin = async () => {
+        if (!newAdminEmail.trim()) {
+            setAdminMessage('يرجى إدخال بريد إلكتروني صحيح');
+            return;
+        }
+
+        // التحقق إذا كان المستخدم موجوداً في قاعدة البيانات
+        const userQuery = query(collection(db, 'users'), where('email', '==', newAdminEmail));
+        const userSnapshot = await getDocs(userQuery);
+
+        if (userSnapshot.empty) {
+            setAdminMessage('المستخدم غير موجود في النظام');
+            return;
+        }
+
+        const userData = userSnapshot.docs[0].data() as User;
+
+        // التحقق إذا كان المستخدم مسؤولاً بالفعل
+        const isAlreadyAdmin = admins.some(admin => admin.email === newAdminEmail) ||
+            STATIC_ADMIN_EMAILS.includes(newAdminEmail);
+
+        if (isAlreadyAdmin) {
+            setAdminMessage('المستخدم مسؤول بالفعل');
+            return;
+        }
+
+        try {
+            // إضافة المستخدم إلى مجموعة admins
+            await addDoc(collection(db, 'admins'), {
+                email: newAdminEmail,
+                name: userData.name || userData.displayName || `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
+                createdAt: serverTimestamp()
+            });
+
+            setAdminMessage('تمت إضافة المسؤول بنجاح');
+            setNewAdminEmail('');
+            fetchData(); // تحديث البيانات
+        } catch (error) {
+            console.error('Error adding admin:', error);
+            setAdminMessage('حدث خطأ أثناء إضافة المسؤول');
+        }
+    };
+
+    // حذف مسؤول
+    const removeAdmin = async (adminId: string, adminEmail: string) => {
+        // منع حذف المسؤولين الثابتين
+        if (STATIC_ADMIN_EMAILS.includes(adminEmail)) {
+            setAdminMessage('لا يمكن حذف المسؤولين الثابتين');
+            return;
+        }
+
+        try {
+            await deleteDoc(doc(db, 'admins', adminId));
+            setAdminMessage('تم حذف المسؤول بنجاح');
+            fetchData(); // تحديث البيانات
+        } catch (error) {
+            console.error('Error removing admin:', error);
+            setAdminMessage('حدث خطأ أثناء حذف المسؤول');
         }
     };
 
@@ -232,7 +259,7 @@ export default function AdminDashboard() {
                 name: newProduct.name,
                 price: parseFloat(newProduct.price),
                 description: newProduct.description,
-                imageUrl: newProduct.imageUrl,
+                imageUrl: newProduct.imageUrl, // تم تغيير image إلى imageUrl
                 category: newProduct.category,
                 stock: parseInt(newProduct.stock),
                 createdAt: serverTimestamp()
@@ -244,7 +271,7 @@ export default function AdminDashboard() {
                 name: '',
                 price: '',
                 description: '',
-                imageUrl: '',
+                imageUrl: '', // تم تغيير image إلى imageUrl
                 category: '',
                 stock: ''
             });
@@ -267,7 +294,7 @@ export default function AdminDashboard() {
                 name: editingProduct.name,
                 price: editingProduct.price,
                 description: editingProduct.description,
-                imageUrl: editingProduct.imageUrl,
+                imageUrl: editingProduct.imageUrl, // تم تغيير image إلى imageUrl
                 category: editingProduct.category,
                 stock: editingProduct.stock,
                 updatedAt: serverTimestamp()
@@ -341,8 +368,7 @@ export default function AdminDashboard() {
         }
     };
 
-    // عرض شاشة التحميل أثناء التحقق من الصلاحيات
-    if (loading || !adminCheckComplete || (isAdmin && isLoading)) {
+    if (loading || isLoading) {
         return (
             <div className={styles.loadingContainer}>
                 <div className={styles.spinner}></div>
@@ -350,19 +376,12 @@ export default function AdminDashboard() {
         );
     }
 
-    // عرض رسالة عدم الصلاحية
-    if (!isAdmin) {
+    if (!isUserAdmin()) {
         return (
             <div className={styles.unauthorizedContainer}>
                 <div className={styles.unauthorizedContent}>
                     <h1 className={styles.unauthorizedTitle}>غير مصرح لك بالدخول</h1>
                     <p className={styles.unauthorizedText}>ليس لديك صلاحيات للوصول إلى لوحة الإدارة</p>
-                    <button
-                        onClick={() => router.push('/')}
-                        className={styles.backButton}
-                    >
-                        العودة للصفحة الرئيسية
-                    </button>
                 </div>
             </div>
         );
@@ -429,6 +448,20 @@ export default function AdminDashboard() {
                             </div>
                         </div>
                     </div>
+
+                    <div className={styles.statCard}>
+                        <div className={styles.statContent}>
+                            <div className={`${styles.statIcon} ${styles.blueIcon}`}>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                            </div>
+                            <div className={styles.statInfo}>
+                                <p className={styles.statLabel}>المسؤولون</p>
+                                <p className={styles.statValue}>{admins.length + STATIC_ADMIN_EMAILS.length}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {/* التنقل والمحتوى */}
@@ -438,7 +471,8 @@ export default function AdminDashboard() {
                             {[
                                 { id: 'products' as const, name: 'المنتجات', count: products.length },
                                 { id: 'orders' as const, name: 'الطلبات', count: orders.length },
-                                { id: 'users' as const, name: 'المستخدمين', count: users.length }
+                                { id: 'users' as const, name: 'المستخدمين', count: users.length },
+                                { id: 'admins' as const, name: 'المسؤولين', count: admins.length + STATIC_ADMIN_EMAILS.length }
                             ].map((tab) => (
                                 <button
                                     key={tab.id}
@@ -631,6 +665,71 @@ export default function AdminDashboard() {
                                         ))}
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* محتوى المسؤولين */}
+                    {activeTab === 'admins' && (
+                        <div className={styles.tabContent}>
+                            <div className={styles.sectionHeader}>
+                                <h2 className={styles.sectionTitle}>إدارة المسؤولين</h2>
+                            </div>
+
+                            <div className={styles.adminsSection}>
+                                <div className={styles.addAdminForm}>
+                                    <h3>إضافة مسؤول جديد</h3>
+                                    <div className={styles.formGroup}>
+                                        <input
+                                            type="email"
+                                            placeholder="البريد الإلكتروني للمستخدم"
+                                            value={newAdminEmail}
+                                            onChange={(e) => setNewAdminEmail(e.target.value)}
+                                            className={styles.formInput}
+                                        />
+                                        <button
+                                            onClick={addAdmin}
+                                            className={styles.addButton}
+                                        >
+                                            إضافة مسؤول
+                                        </button>
+                                    </div>
+                                    {adminMessage && <p className={styles.message}>{adminMessage}</p>}
+                                </div>
+
+                                <div className={styles.adminsList}>
+                                    <h3>المسؤولون الثابتون</h3>
+                                    <ul className={styles.adminList}>
+                                        {STATIC_ADMIN_EMAILS.map((email, index) => (
+                                            <li key={`static-${index}`} className={styles.adminItem}>
+                                                <span>{email}</span>
+                                                <span className={styles.staticBadge}>ثابت</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    <h3>المسؤولون المضافون</h3>
+                                    {admins.length === 0 ? (
+                                        <p>لا يوجد مسؤولون مضافون</p>
+                                    ) : (
+                                        <ul className={styles.adminList}>
+                                            {admins.map(admin => (
+                                                <li key={admin.id} className={styles.adminItem}>
+                                                    <div>
+                                                        <span>{admin.email}</span>
+                                                        {admin.name && <span className={styles.adminName}> - {admin.name}</span>}
+                                                    </div>
+                                                    <button
+                                                        onClick={() => removeAdmin(admin.id, admin.email)}
+                                                        className={styles.deleteButton}
+                                                    >
+                                                        حذف
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     )}
