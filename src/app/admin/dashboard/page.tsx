@@ -27,7 +27,7 @@ interface Product {
     name: string;
     price: number;
     description?: string;
-    image?: string;
+    imageUrl?: string; // تم تغيير image إلى imageUrl
     category?: string;
     stock: number;
     createdAt?: any;
@@ -70,7 +70,7 @@ interface NewProductForm {
     name: string;
     price: string;
     description: string;
-    image: string;
+    imageUrl: string; // تم تغيير image إلى imageUrl
     category: string;
     stock: string;
 }
@@ -93,7 +93,7 @@ export default function AdminDashboard() {
         name: '',
         price: '',
         description: '',
-        image: '',
+        imageUrl: '', // تم تغيير image إلى imageUrl
         category: '',
         stock: ''
     });
@@ -125,10 +125,21 @@ export default function AdminDashboard() {
 
             // جلب المنتجات
             const productsSnapshot = await getDocs(collection(db, 'products'));
-            const productsData: Product[] = productsSnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            } as Product));
+            const productsData: Product[] = productsSnapshot.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    name: data.name,
+                    price: data.price,
+                    description: data.description,
+                    // التعامل مع الحقول القديمة والجديدة للصور
+                    imageUrl: data.imageUrl || data.image || '',
+                    category: data.category,
+                    stock: data.stock,
+                    createdAt: data.createdAt,
+                    updatedAt: data.updatedAt
+                } as Product;
+            });
             setProducts(productsData);
 
             // جلب الطلبات
@@ -168,7 +179,7 @@ export default function AdminDashboard() {
                 name: newProduct.name,
                 price: parseFloat(newProduct.price),
                 description: newProduct.description,
-                image: newProduct.image,
+                imageUrl: newProduct.imageUrl, // تم تغيير image إلى imageUrl
                 category: newProduct.category,
                 stock: parseInt(newProduct.stock),
                 createdAt: serverTimestamp()
@@ -180,7 +191,7 @@ export default function AdminDashboard() {
                 name: '',
                 price: '',
                 description: '',
-                image: '',
+                imageUrl: '', // تم تغيير image إلى imageUrl
                 category: '',
                 stock: ''
             });
@@ -203,7 +214,7 @@ export default function AdminDashboard() {
                 name: editingProduct.name,
                 price: editingProduct.price,
                 description: editingProduct.description,
-                image: editingProduct.image,
+                imageUrl: editingProduct.imageUrl, // تم تغيير image إلى imageUrl
                 category: editingProduct.category,
                 stock: editingProduct.stock,
                 updatedAt: serverTimestamp()
@@ -413,7 +424,7 @@ export default function AdminDashboard() {
                                                     <div className={styles.productInfo}>
                                                         <div className={styles.productImage}>
                                                             <img
-                                                                src={product.image || '/placeholder.png'}
+                                                                src={product.imageUrl || '/placeholder.png'}
                                                                 alt={product.name}
                                                             />
                                                         </div>
@@ -613,12 +624,12 @@ export default function AdminDashboard() {
                                 />
                             </div>
                             <div className={styles.formGroup}>
-                                <label htmlFor="new-product-image" className={styles.formLabel}>رابط الصورة</label>
+                                <label htmlFor="new-product-imageUrl" className={styles.formLabel}>رابط الصورة</label>
                                 <input
-                                    id="new-product-image"
+                                    id="new-product-imageUrl"
                                     type="url"
-                                    value={newProduct.image}
-                                    onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
+                                    value={newProduct.imageUrl}
+                                    onChange={(e) => setNewProduct({ ...newProduct, imageUrl: e.target.value })}
                                     className={styles.formInput}
                                     placeholder="https://example.com/image.jpg"
                                 />
@@ -717,12 +728,12 @@ export default function AdminDashboard() {
                                 />
                             </div>
                             <div className={styles.formGroup}>
-                                <label htmlFor="edit-product-image" className={styles.formLabel}>رابط الصورة</label>
+                                <label htmlFor="edit-product-imageUrl" className={styles.formLabel}>رابط الصورة</label>
                                 <input
-                                    id="edit-product-image"
+                                    id="edit-product-imageUrl"
                                     type="url"
-                                    value={editingProduct.image || ''}
-                                    onChange={(e) => setEditingProduct({ ...editingProduct, image: e.target.value })}
+                                    value={editingProduct.imageUrl || ''}
+                                    onChange={(e) => setEditingProduct({ ...editingProduct, imageUrl: e.target.value })}
                                     className={styles.formInput}
                                     placeholder="https://example.com/image.jpg"
                                 />
