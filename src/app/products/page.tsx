@@ -144,19 +144,22 @@ export default function ProductsPage() {
                         spaceBetween={20}
                         slidesPerView="auto"
                         freeMode={true}
-                        mousewheel={true}
+                        mousewheel={{
+                            forceToAxis: true,
+                            sensitivity: 0.5,
+                        }}
                         grabCursor={true}
                         navigation={{
-                            nextEl: '.swiper-button-next',
-                            prevEl: '.swiper-button-prev',
+                            nextEl: `.${styles.swiperButtonNext}`,
+                            prevEl: `.${styles.swiperButtonPrev}`,
                         }}
                         pagination={{
-                            el: '.swiper-pagination',
+                            el: `.${styles.swiperPagination}`,
                             clickable: true,
                             dynamicBullets: true,
                         }}
                         scrollbar={{
-                            el: '.swiper-scrollbar',
+                            el: `.${styles.swiperScrollbar}`,
                             draggable: true,
                         }}
                         breakpoints={{
@@ -191,28 +194,14 @@ export default function ProductsPage() {
                     </Swiper>
 
                     {/* أزرار التنقل المخصصة */}
-                    <div className="swiper-button-prev" style={{
-                        color: '#007bff',
-                        left: '10px',
-                        zIndex: 10,
-                    }}></div>
-                    <div className="swiper-button-next" style={{
-                        color: '#007bff',
-                        right: '10px',
-                        zIndex: 10,
-                    }}></div>
+                    <div className={styles.swiperButtonPrev}></div>
+                    <div className={styles.swiperButtonNext}></div>
 
                     {/* النقاط التفاعلية */}
-                    <div className="swiper-pagination" style={{
-                        bottom: '-40px',
-                    }}></div>
+                    <div className={styles.swiperPagination}></div>
 
                     {/* شريط التمرير */}
-                    <div className="swiper-scrollbar" style={{
-                        bottom: '-60px',
-                        background: '#f0f0f0',
-                        height: '4px',
-                    }}></div>
+                    <div className={styles.swiperScrollbar}></div>
                 </div>
             )}
 
