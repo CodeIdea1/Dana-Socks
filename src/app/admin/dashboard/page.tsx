@@ -14,8 +14,7 @@ import {
     serverTimestamp,
     query,
     orderBy,
-    DocumentData,
-    where
+    DocumentData
 } from 'firebase/firestore';
 import { auth, db } from '../../../lib/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -65,7 +64,6 @@ interface User {
     lastName?: string;
     email: string;
     createdAt?: any;
-    isAdmin?: boolean;
 }
 
 interface NewProductForm {
@@ -77,21 +75,17 @@ interface NewProductForm {
     stock: string;
 }
 
-// قائمة البريد الإلكتروني للمسؤولين الثابتين
-const STATIC_ADMIN_EMAILS = ['sajaahmed1007@gmail.com', 'sajaahmed1007@gmail.com']; // ضع إيميلات الأدمن هنا
+
+const ADMIN_EMAILS = ['sajaahmed1007@gmail.com', 'sajaahmed1007@gmail.com']; // ضع إيميلات الأدمن هنا
 
 export default function AdminDashboard() {
     const [user, loading, error] = useAuthState(auth);
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'users' | 'admins'>('products');
+    const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'users'>('products');
     const [products, setProducts] = useState<Product[]>([]);
     const [orders, setOrders] = useState<Order[]>([]);
     const [users, setUsers] = useState<User[]>([]);
-    const [admins, setAdmins] = useState<User[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [newAdminEmail, setNewAdminEmail] = useState<string>('');
-    const [adminMessage, setAdminMessage] = useState<string>('');
-    const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
     // حالات إضافة منتج جديد
     const [showAddProduct, setShowAddProduct] = useState<boolean>(false);
@@ -112,48 +106,18 @@ export default function AdminDashboard() {
     const [showOrderDetails, setShowOrderDetails] = useState<boolean>(false);
 
     // التحقق من صلاحيات الأدمن
-    const checkUserAdmin = async () => {
-        if (!user?.email) return false;
-
-        // التحقق من البريد الإلكتروني للمسؤولين الثابتين
-        if (STATIC_ADMIN_EMAILS.includes(user.email)) {
-            setIsAdmin(true);
-            return true;
-        }
-
-        // التحقق من مجموعة admins في Firestore
-        try {
-            const adminsQuery = query(collection(db, 'admins'), where('email', '==', user.email));
-            const adminsSnapshot = await getDocs(adminsQuery);
-
-            if (!adminsSnapshot.empty) {
-                setIsAdmin(true);
-                return true;
-            }
-
-            setIsAdmin(false);
-            return false;
-        } catch (error) {
-            console.error('Error checking admin status:', error);
-            setIsAdmin(false);
-            return false;
-        }
-    };
+    const isAdmin = user && ADMIN_EMAILS.includes(user.email || '');
 
     useEffect(() => {
-        const verifyAdmin = async () => {
-            if (!loading && user) {
-                const adminStatus = await checkUserAdmin();
-                if (!adminStatus) {
-                    router.push('/');
-                    return;
-                }
-                fetchData();
-            }
-        };
+        if (!loading && (!user || !isAdmin)) {
+            router.push('/');
+            return;
+        }
 
-        verifyAdmin();
-    }, [user, loading]);
+        if (isAdmin) {
+            fetchData();
+        }
+    }, [user, loading, isAdmin, router]);
 
     const fetchData = async (): Promise<void> => {
         try {
@@ -200,92 +164,11 @@ export default function AdminDashboard() {
 
             setUsers(usersData);
 
-            // جلب المسؤولين من مجموعة admins
-            const adminsQuery = query(collection(db, 'admins'));
-            const adminsSnapshot = await getDocs(adminsQuery);
-            const adminsData: User[] = adminsSnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            } as User));
-            setAdmins(adminsData);
-
         } catch (error) {
             console.error('Error fetching data:', error);
             alert('حدث خطأ في تحميل البيانات');
         } finally {
             setIsLoading(false);
-        }
-    };
-
-    // إضافة مسؤول جديد
-    const addAdmin = async () => {
-        if (!newAdminEmail.trim()) {
-            setAdminMessage('يرجى إدخال بريد إلكتروني صحيح');
-            return;
-        }
-
-        // التحقق من صحة البريد الإلكتروني
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(newAdminEmail)) {
-            setAdminMessage('يرجى إدخال بريد إلكتروني صحيح');
-            return;
-        }
-
-        // التحقق إذا كان المستخدم مسؤولاً بالفعل
-        const isAlreadyAdmin = admins.some(admin => admin.email === newAdminEmail) ||
-            STATIC_ADMIN_EMAILS.includes(newAdminEmail);
-
-        if (isAlreadyAdmin) {
-            setAdminMessage('المستخدم مسؤول بالفعل');
-            return;
-        }
-
-        try {
-            // التحقق إذا كان المستخدم موجوداً في قاعدة البيانات
-            const userQuery = query(collection(db, 'users'), where('email', '==', newAdminEmail));
-            const userSnapshot = await getDocs(userQuery);
-
-            let userName = newAdminEmail.split('@')[0]; // اسم افتراضي من البريد الإلكتروني
-
-            if (!userSnapshot.empty) {
-                const userData = userSnapshot.docs[0].data() as User;
-                userName = userData.name || userData.displayName ||
-                    `${userData.firstName || ''} ${userData.lastName || ''}`.trim() ||
-                    newAdminEmail.split('@')[0];
-            }
-
-            // إضافة المستخدم إلى مجموعة admins
-            await addDoc(collection(db, 'admins'), {
-                email: newAdminEmail,
-                name: userName,
-                createdAt: serverTimestamp(),
-                addedBy: user?.email
-            });
-
-            setAdminMessage('تمت إضافة المسؤول بنجاح');
-            setNewAdminEmail('');
-            fetchData(); // تحديث البيانات
-        } catch (error) {
-            console.error('Error adding admin:', error);
-            setAdminMessage('حدث خطأ أثناء إضافة المسؤول. تأكد من صحة البريد الإلكتروني.');
-        }
-    };
-
-    // حذف مسؤول
-    const removeAdmin = async (adminId: string, adminEmail: string) => {
-        // منع حذف المسؤولين الثابتين
-        if (STATIC_ADMIN_EMAILS.includes(adminEmail)) {
-            setAdminMessage('لا يمكن حذف المسؤولين الثابتين');
-            return;
-        }
-
-        try {
-            await deleteDoc(doc(db, 'admins', adminId));
-            setAdminMessage('تم حذف المسؤول بنجاح');
-            fetchData(); // تحديث البيانات
-        } catch (error) {
-            console.error('Error removing admin:', error);
-            setAdminMessage('حدث خطأ أثناء حذف المسؤول');
         }
     };
 
@@ -404,7 +287,6 @@ export default function AdminDashboard() {
             return 'غير محدد';
         }
     };
-
     if (loading || isLoading) {
         return (
             <div className={styles.loadingContainer}>
@@ -485,20 +367,6 @@ export default function AdminDashboard() {
                             </div>
                         </div>
                     </div>
-
-                    <div className={styles.statCard}>
-                        <div className={styles.statContent}>
-                            <div className={`${styles.statIcon} ${styles.blueIcon}`}>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                                </svg>
-                            </div>
-                            <div className={styles.statInfo}>
-                                <p className={styles.statLabel}>المسؤولون</p>
-                                <p className={styles.statValue}>{admins.length + STATIC_ADMIN_EMAILS.length}</p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 {/* التنقل والمحتوى */}
@@ -508,8 +376,7 @@ export default function AdminDashboard() {
                             {[
                                 { id: 'products' as const, name: 'المنتجات', count: products.length },
                                 { id: 'orders' as const, name: 'الطلبات', count: orders.length },
-                                { id: 'users' as const, name: 'المستخدمين', count: users.length },
-                                { id: 'admins' as const, name: 'المسؤولين', count: admins.length + STATIC_ADMIN_EMAILS.length }
+                                { id: 'users' as const, name: 'المستخدمين', count: users.length }
                             ].map((tab) => (
                                 <button
                                     key={tab.id}
@@ -702,71 +569,6 @@ export default function AdminDashboard() {
                                         ))}
                                     </tbody>
                                 </table>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* محتوى المسؤولين */}
-                    {activeTab === 'admins' && (
-                        <div className={styles.tabContent}>
-                            <div className={styles.sectionHeader}>
-                                <h2 className={styles.sectionTitle}>إدارة المسؤولين</h2>
-                            </div>
-
-                            <div className={styles.adminsSection}>
-                                <div className={styles.addAdminForm}>
-                                    <h3>إضافة مسؤول جديد</h3>
-                                    <div className={styles.formGroup}>
-                                        <input
-                                            type="email"
-                                            placeholder="البريد الإلكتروني للمستخدم"
-                                            value={newAdminEmail}
-                                            onChange={(e) => setNewAdminEmail(e.target.value)}
-                                            className={styles.formInput}
-                                        />
-                                        <button
-                                            onClick={addAdmin}
-                                            className={styles.addButton}
-                                        >
-                                            إضافة مسؤول
-                                        </button>
-                                    </div>
-                                    {adminMessage && <p className={adminMessage.includes('خطأ') ? styles.errorMessage : styles.successMessage}>{adminMessage}</p>}
-                                </div>
-
-                                <div className={styles.adminsList}>
-                                    <h3>المسؤولون الثابتون</h3>
-                                    <ul className={styles.adminList}>
-                                        {STATIC_ADMIN_EMAILS.map((email, index) => (
-                                            <li key={`static-${index}`} className={styles.adminItem}>
-                                                <span>{email}</span>
-                                                <span className={styles.staticBadge}>ثابت</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-
-                                    <h3>المسؤولون المضافون</h3>
-                                    {admins.length === 0 ? (
-                                        <p>لا يوجد مسؤولون مضافون</p>
-                                    ) : (
-                                        <ul className={styles.adminList}>
-                                            {admins.map(admin => (
-                                                <li key={admin.id} className={styles.adminItem}>
-                                                    <div>
-                                                        <span>{admin.email}</span>
-                                                        {admin.name && <span className={styles.adminName}> - {admin.name}</span>}
-                                                    </div>
-                                                    <button
-                                                        onClick={() => removeAdmin(admin.id, admin.email)}
-                                                        className={styles.deleteButton}
-                                                    >
-                                                        حذف
-                                                    </button>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </div>
                             </div>
                         </div>
                     )}
