@@ -49,7 +49,9 @@ export default function ProductsPage() {
                         createdAt: data.createdAt || '',
                         description: data.description || '',
                         id: doc.id,
-                        imageUrl: data.imageUrl || '/https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUiouPTRrsa1YqBlA6IatM4nBydTclYYVF2w&s',
+                        imageUrl: data.imageUrl
+                            ? data.imageUrl
+                            : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUiouPTRrsa1YqBlA6IatM4nBydTclYYVF2w&s',
                         name: data.name || 'غير محدد',
                         price: Number(data.price) || 0,
                         stock: Number(data.stock) || 0,
