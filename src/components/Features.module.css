@@ -1,0 +1,336 @@
+/* components/Features.module.css */
+
+.featuresSection {
+    padding: 80px 0;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    overflow-x: hidden;
+    /* Prevent horizontal scroll during animations */
+}
+
+.container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 20px;
+    width: 100%;
+}
+
+.content {
+    display: flex;
+    align-items: center;
+    gap: 80px;
+    min-height: 600px;
+}
+
+.leftContent {
+    flex: 1;
+    max-width: 500px;
+}
+
+.title {
+    font-size: 3.5rem;
+    font-weight: 400;
+    color: #333;
+    margin-bottom: 30px;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    /* حالة أولية للانيميشن */
+    opacity: 0;
+    transform: translateY(50px);
+}
+
+.description {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #666;
+    margin-bottom: 40px;
+    max-width: 450px;
+    /* حالة أولية للانيميشن */
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.aboutButton {
+    background: transparent;
+    border: 2px solid #333;
+    color: #333;
+    padding: 12px 30px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+    width: 100%;
+    /* حالة أولية للانيميشن */
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.aboutButton:hover {
+    background-color: #333;
+    color: white;
+}
+
+.madeInInfo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+    /* حالة أولية للانيميشن */
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+.map {
+    width: 120px;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.madeText {
+    position: absolute;
+    left: 22px;
+}
+
+.madeLabel {
+    font-size: 0.8rem;
+    color: #999;
+    font-weight: 400;
+}
+
+.madeLocation {
+    font-size: 1rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.rightContent {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.sockContainer {
+    position: relative;
+    width: 400px;
+    height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sockImage {
+    position: relative;
+    width: 300px;
+    height: 400px;
+}
+
+.sock {
+    width: 100%;
+    height: auto;
+    max-width: 280px;
+    transition: transform 0.3s ease;
+    /* حالة أولية للانيميشن */
+    opacity: 0;
+    transform: scale(0.8) rotate(-10deg);
+}
+
+.annotation {
+    position: absolute;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    max-width: 200px;
+    z-index: 2;
+}
+
+.annotationText {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: #555;
+    font-weight: 400;
+    /* تحسين عرض النص */
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    /* إخفاء النص في البداية */
+    opacity: 0;
+}
+
+/* تنسيق الكلمات المميزة */
+.annotationText span:first-child,
+.annotationText span:nth-child(2),
+.annotationText span:nth-child(3),
+.annotationText span:nth-child(4),
+.annotationText span:nth-child(5) {
+    font-weight: 600;
+    color: #333;
+}
+
+/* تنسيق خاص لكلمات معينة */
+.annotationText span:contains("Sock"),
+.annotationText span:contains("fabric"),
+.annotationText span:contains("Moisture-wicking"),
+.annotationText span:contains("Cushion"),
+.annotationText span:contains("MUSCLE"),
+.annotationText span:contains("FATIGUE") {
+    font-weight: 600;
+    color: #333;
+}
+
+/* إضافة تأثيرات hover للتفاعل */
+.annotation:hover {
+    transform: scale(1.02);
+    transition: transform 0.3s ease;
+}
+
+.annotation:hover .annotationText {
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+/* تأثيرات للحروف المتحركة */
+.annotationText span {
+    transition: all 0.1s ease;
+    display: inline-block;
+}
+
+.annotationText span:hover {
+    color: #000;
+    transform: translateY(-1px);
+}
+
+/* تأثيرات إضافية للتمييز */
+.annotation::before {
+    content: '';
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    background-color: #007bff;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.annotation:hover::before {
+    opacity: 1;
+}
+
+/* خط رفيع يربط النقطة بالنص */
+.annotation::after {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 20px;
+    background-color: #007bff;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.annotation:hover::after {
+    opacity: 0.3;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .content {
+        gap: 50px;
+    }
+
+    .sockContainer {
+        width: 350px;
+        height: 450px;
+    }
+
+    .annotation {
+        font-size: 0.8rem;
+        max-width: 180px;
+    }
+
+    .annotationText {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .content {
+        flex-direction: column;
+        gap: 50px;
+        text-align: center;
+    }
+
+    .title {
+        font-size: 2.5rem;
+    }
+
+    .sockContainer {
+        width: 300px;
+        height: 400px;
+    }
+
+    .annotation {
+        position: relative !important;
+        margin: 20px 0;
+        justify-content: center;
+        text-align: left;
+        max-width: 100%;
+    }
+
+    .annotation::before,
+    .annotation::after {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .featuresSection {
+        padding: 40px 0;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+
+    .sockContainer {
+        width: 250px;
+        height: 350px;
+    }
+
+    .sockImage {
+        width: 200px;
+        height: 300px;
+    }
+
+    .annotationText {
+        font-size: 0.75rem;
+    }
+}
+
+/* تحسينات لأداء الانيميشن */
+.annotation,
+.annotationText,
+.annotationText span {
+    will-change: transform, opacity;
+}
+
+/* تحسين الأداء للأجهزة المحمولة */
+@media (max-width: 768px) {
+
+    .annotation,
+    .annotationText,
+    .annotationText span {
+        will-change: auto;
+    }
+}

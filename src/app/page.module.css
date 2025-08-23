@@ -1,67 +1,10 @@
 /* app/page.module.css */
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+  width: 100%;
+  min-height: 100vh;
 }
 
-.hero {
-  text-align: center;
-  padding: 80px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-radius: 12px;
-  margin-bottom: 60px;
-}
-
-.title {
-  font-size: 3rem;
-  font-weight: 700;
-  margin-bottom: 20px;
-}
-
-.description {
-  font-size: 1.2rem;
-  margin-bottom: 30px;
-  opacity: 0.9;
-}
-
-.cta {
-  display: inline-block;
-  background: white;
-  color: #667eea;
-  padding: 12px 30px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: transform 0.2s ease;
-}
-
-.cta:hover {
-  transform: translateY(-2px);
-}
-
-.features {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 30px;
-  padding: 0 20px;
-}
-
-.feature {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
-
-.feature h3 {
-  font-size: 1.5rem;
-  margin-bottom: 15px;
-  color: #333;
-}
-
-.feature p {
-  color: #666;
-  line-height: 1.6;
+.additionalContent {
+  /* للمحتوى الإضافي في المستقبل */
+  padding: 40px 0;
 }

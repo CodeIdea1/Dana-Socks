@@ -439,7 +439,7 @@ export default function AdminDashboard() {
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className={styles.tableCell}>{product.price} ر.س</td>
+                                                <td className={styles.tableCell}>{product.price}LE</td>
                                                 <td className={styles.tableCell}>{product.stock}</td>
                                                 <td className={styles.tableCell}>{product.category || 'غير محدد'}</td>
                                                 <td className={styles.tableCell}>
@@ -492,7 +492,7 @@ export default function AdminDashboard() {
                                                     {order.customerInfo?.fullName || 'غير محدد'}
                                                 </td>
                                                 <td className={styles.tableCell}>
-                                                    {order.totalAmount} ر.س
+                                                    {order.totalAmount}LE
                                                 </td>
                                                 <td className={styles.tableCell}>
                                                     <label htmlFor={`order-status-${order.id}`} className="sr-only">
@@ -809,8 +809,8 @@ export default function AdminDashboard() {
                                         <div className={styles.orderItemDetails}>
                                             <span className={styles.itemName}>{item.productName}</span>
                                             <span className={styles.itemQuantity}>الكمية: {item.quantity}</span>
-                                            <span className={styles.itemPrice}>السعر: {item.price} ر.س</span>
-                                            <span className={styles.itemSubtotal}>المجموع: {item.subtotal} ر.س</span>
+                                            <span className={styles.itemPrice}>السعر: {item.price}LE</span>
+                                            <span className={styles.itemSubtotal}>المجموع: {item.subtotal}LE</span>
                                         </div>
                                     </div>
                                 ))}
@@ -818,7 +818,7 @@ export default function AdminDashboard() {
 
                             <div className={styles.orderSection}>
                                 <div className={styles.orderSummary}>
-                                    <p><strong>المبلغ الإجمالي:</strong> {selectedOrder.totalAmount} ر.س</p>
+                                    <p><strong>المبلغ الإجمالي:</strong> {selectedOrder.totalAmount}LE</p>
                                     <p><strong>الحالة:</strong> {
                                         selectedOrder.status === 'pending' ? 'قيد الانتظار' :
                                             selectedOrder.status === 'processing' ? 'قيد التجهيز' :

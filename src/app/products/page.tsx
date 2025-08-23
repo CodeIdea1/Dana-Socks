@@ -116,15 +116,7 @@ export default function ProductsPage() {
     }
 
     return (
-        <div className={styles.container}>
-            <div className={styles.header}>
-                <h1 className={styles.title}>منتجاتنا</h1>
-                <p className={styles.subtitle}>اختر من تشكيلتنا الواسعة من الشرابات عالية الجودة</p>
-                <p className={styles.productCount}>
-                    {products.length > 0 && `عدد المنتجات المتوفرة: ${products.length}`}
-                </p>
-            </div>
-
+        <div className={styles.container} id='products'>
             {error && (
                 <div className={styles.warning}>
                     <p>{error}</p>
