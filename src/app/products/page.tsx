@@ -8,13 +8,12 @@ import styles from './products.module.css';
 
 // استيراد Swiper وmodules
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Scrollbar, A11y, FreeMode, Mousewheel } from 'swiper/modules';
+import { Navigation, Pagination, A11y, FreeMode, Mousewheel } from 'swiper/modules';
 
 // استيراد CSS الخاص بـ Swiper
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import 'swiper/css/scrollbar';
 import 'swiper/css/free-mode';
 
 export default function ProductsPage() {
@@ -132,8 +131,8 @@ export default function ProductsPage() {
             {products.length > 0 && (
                 <div className={styles.swiperContainer}>
                     <Swiper
-                        modules={[Navigation, Pagination, Scrollbar, A11y, FreeMode, Mousewheel]}
-                        spaceBetween={20}
+                        modules={[Navigation, Pagination, A11y, FreeMode, Mousewheel]}
+                        spaceBetween={10}
                         slidesPerView="auto"
                         freeMode={true}
                         mousewheel={{
@@ -150,10 +149,6 @@ export default function ProductsPage() {
                             clickable: true,
                             dynamicBullets: true,
                         }}
-                        scrollbar={{
-                            el: `.${styles.swiperScrollbar}`,
-                            draggable: true,
-                        }}
                         breakpoints={{
                             320: {
                                 slidesPerView: 1,
@@ -164,15 +159,15 @@ export default function ProductsPage() {
                                 spaceBetween: 15,
                             },
                             768: {
-                                slidesPerView: 2.5,
+                                slidesPerView: 2,
                                 spaceBetween: 20,
                             },
                             1024: {
-                                slidesPerView: 3.5,
+                                slidesPerView: 2.5,
                                 spaceBetween: 25,
                             },
                             1200: {
-                                slidesPerView: 4,
+                                slidesPerView: 3,
                                 spaceBetween: 30,
                             },
                         }}
@@ -191,9 +186,6 @@ export default function ProductsPage() {
 
                     {/* النقاط التفاعلية */}
                     <div className={styles.swiperPagination}></div>
-
-                    {/* شريط التمرير */}
-                    <div className={styles.swiperScrollbar}></div>
                 </div>
             )}
 

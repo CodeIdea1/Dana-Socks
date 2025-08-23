@@ -87,12 +87,11 @@
 /* Swiper Styles */
 .swiperContainer {
     position: relative;
-    padding: 20px 0 80px;
+    padding-bottom: 50px;
+    /* مساحة للنقاط */
 }
 
-.productsSwiper {
-    padding: 10px 5px 30px;
-}
+
 
 .swiperSlide {
     height: auto;
@@ -133,12 +132,13 @@
 }
 
 .swiperPagination {
-    bottom: -40px;
+    bottom: 0;
     position: absolute;
     width: 100%;
     display: flex;
     justify-content: center;
     gap: 8px;
+    padding: 15px 0;
 }
 
 .swiperPagination :global(.swiper-pagination-bullet) {
@@ -146,24 +146,22 @@
     height: 12px;
     background-color: #ddd;
     opacity: 1;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    cursor: pointer;
 }
 
 .swiperPagination :global(.swiper-pagination-bullet-active) {
     background-color: #007bff;
+    transform: scale(1.2);
 }
 
-.swiperScrollbar {
-    bottom: -60px;
-    background: #f0f0f0;
-    height: 4px;
-    position: absolute;
-    width: 100%;
+.swiperPagination :global(.swiper-pagination-bullet:hover) {
+    background-color: #0056b3;
+    transform: scale(1.1);
 }
 
-.swiperScrollbar :global(.swiper-scrollbar-drag) {
-    background: #007bff;
-}
+/* إزالة شريط التمرير السفلي تماماً */
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -191,5 +189,15 @@
 
     .swiperButtonNext {
         right: 5px;
+    }
+
+    .swiperContainer {
+        padding-bottom: 40px;
+        /* تقليل المساحة في الموبايل */
+    }
+
+    .swiperPagination :global(.swiper-pagination-bullet) {
+        width: 10px;
+        height: 10px;
     }
 }
