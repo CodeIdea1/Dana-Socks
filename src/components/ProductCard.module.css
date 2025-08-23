@@ -1,6 +1,6 @@
 /* components/ProductCard.module.css */
 .card {
-    background: #5a6fd8;
+    background-color: #3d74b6;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     overflow: hidden;
@@ -26,7 +26,7 @@
 }
 
 .image {
-    width: 150px !important;
+    width: 80% !important;
     height: auto;
     object-fit: cover;
     transition: transform 0.2s ease;
@@ -72,10 +72,7 @@
 }
 
 .description {
-    color: #666;
-    font-size: 0.9rem;
-    margin-bottom: 15px;
-    line-height: 1.4;
+    display: none;
 }
 
 .priceStock {
@@ -106,19 +103,14 @@
 }
 
 .addToCartBtn {
-    background: #667eea;
+    background-color: transparent;
     color: white;
     padding: 10px 20px;
-    border-radius: 6px;
     font-weight: 600;
-    transition: background 0.2s ease;
     flex: 1;
-    margin-right: 10px;
 }
 
-.addToCartBtn:hover:not(:disabled) {
-    background: #5a6fd8;
-}
+
 
 .addToCartBtn:disabled {
     background: #ccc;

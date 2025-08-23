@@ -110,7 +110,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                         onClick={handleAddToCart}
                         disabled={product.stock === 0}
                     >
-                        {product.stock === 0 ? 'نفد المخزون' : 'أضف للسلة'}
+                        {product.stock === 0 ? 'Out of stock' : 'Add to cart'}
                     </button>
                     {cartItem && (
                         <span className={styles.cartQuantity}>

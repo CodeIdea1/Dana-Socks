@@ -63,7 +63,7 @@
 
 .loadingSpinner {
     font-size: 1.5rem;
-    color: #007bff;
+    background: #3d74b6;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -88,7 +88,6 @@
 .swiperContainer {
     position: relative;
     padding-bottom: 50px;
-    /* مساحة للنقاط */
 }
 
 
