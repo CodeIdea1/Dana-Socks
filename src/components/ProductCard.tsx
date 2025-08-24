@@ -1,124 +1,130 @@
-'use client';
-// components/ProductCard.tsx
-import { Product, useCart } from '@/contexts/CartContext';
+import React from 'react';
+import { useRouter } from 'next/navigation';
+import { Product } from '@/contexts/CartContext';
+import { useCart } from '@/contexts/CartContext';
 import styles from './ProductCard.module.css';
 
 interface ProductCardProps {
     product: Product;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
-    const { addToCart, addToWishlist, wishlistItems, cartItems } = useCart();
+const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+    const { addToCart, addToWishlist, removeFromWishlist, wishlistItems, cartItems, removeFromCart } = useCart();
+    const router = useRouter();
 
+    // التحقق من وجود المنتج في المفضلة
     const isInWishlist = wishlistItems.some(item => item.id === product.id);
-    const cartItem = cartItems.find(item => item.product?.id === product.id);
 
-    const handleAddToCart = () => {
-        addToCart(product);
-    };
+    // التحقق من وجود المنتج في السلة
+    const isInCart = cartItems.some(item => item.id === product.id);
 
-    const handleAddToWishlist = () => {
-        addToWishlist(product);
-    };
+    const handleCartToggle = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
 
-    // تنظيف وفحص رابط الصورة
-    const getImageUrl = (url: string | undefined): string => {
-        if (!url || url.trim() === '') {
-            return '/placeholder.png';
-        }
-
-        // إزالة المسافات الزائدة
-        const cleanUrl = url.trim();
-
-        // التحقق من صحة الرابط
-        try {
-            new URL(cleanUrl);
-            return cleanUrl;
-        } catch {
-            console.warn('Invalid URL:', url);
-            return '/placeholder.png';
+        if (isInCart) {
+            removeFromCart(product.id);
+        } else {
+            addToCart(product);
         }
     };
 
-    const imageUrl = getImageUrl(product.imageUrl);
-
-    const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-        console.error('Image failed to load:', imageUrl);
-        console.error('Product details:', {
-            id: product.id,
-            name: product.name,
-            originalImageUrl: product.imageUrl
-        });
-
-        // استخدام صورة احتياطية
-        const target = e.target as HTMLImageElement;
-        target.src = '/placeholder.png';
-
-        // إذا فشلت الصورة الاحتياطية أيضاً، إخفاء الصورة
-        target.onerror = () => {
-            target.style.display = 'none';
-            console.error('Fallback image also failed');
-        };
+    const handleViewDetails = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        // الانتقال إلى صفحة تفاصيل المنتج
+        router.push(`/products/${product.id}`);
     };
 
-    const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-        console.log('✅ Image loaded successfully:', imageUrl);
-        const target = e.target as HTMLImageElement;
-        target.style.opacity = '1';
+    const handleWishlistToggle = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (isInWishlist) {
+            removeFromWishlist(product.id);
+        } else {
+            addToWishlist(product);
+        }
+    };
+
+    const formatPrice = (price: number) => {
+        return new Intl.NumberFormat('ar-EG').format(price);
     };
 
     return (
-        <div className={styles.card}>
+        <div className={styles.productCard}>
             <div className={styles.imageContainer}>
                 <img
-                    src={imageUrl}
-                    alt={product.name || 'منتج'}
-                    className={styles.image}
-                    onError={handleImageError}
-                    onLoad={handleImageLoad}
-                    loading="lazy"
-                    style={{
-                        opacity: '0',
-                        transition: 'opacity 0.3s ease',
-                        objectFit: 'cover',
-                        width: '100%',
-                        height: '100%'
+                    src={product.imageUrl || '/placeholder.jpg'}
+                    alt={product.name}
+                    className={styles.productImage}
+                    onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/placeholder.jpg';
                     }}
-                    // إضافة crossOrigin للتعامل مع الروابط الخارجية
-                    crossOrigin="anonymous"
                 />
-                <button
-                    className={`${styles.wishlistBtn} ${isInWishlist ? styles.active : ''}`}
-                    onClick={handleAddToWishlist}
-                    aria-label={isInWishlist ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}
-                >
-                    ♥
-                </button>
-            </div>
 
-            <div className={styles.content}>
-                <h3 className={styles.name}>{product.name}</h3>
-                <p className={styles.description}>{product.description}</p>
-                <div className={styles.priceStock}>
-                    <span className={styles.price}>{product.price} ج.م</span>
-                    <span className={styles.stock}>المتوفر: {product.stock}</span>
+                {/* أيقونة المفضلة */}
+                <button
+                    className={`${styles.wishlistButton} ${isInWishlist ? styles.inWishlist : ''}`}
+                    onClick={handleWishlistToggle}
+                    title={isInWishlist ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}
+                >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill={isInWishlist ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                </button>
+
+                {/* overlay الذي يظهر عند الهوفر */}
+                <div className={styles.hoverOverlay}>
+                    <div className={styles.buttonGroup}>
+                        <button
+                            className={styles.detailsButton}
+                            onClick={handleViewDetails}
+                            title="عرض التفاصيل"
+                        >
+                            <span className={styles.buttonIcon}>👁️</span>
+                            انقر لعرض التفاصيل
+                        </button>
+
+                        <button
+                            className={`${styles.addToCartButton} ${isInCart ? styles.inCart : ''}`}
+                            onClick={handleCartToggle}
+                            title={isInCart ? 'إزالة من السلة' : 'إضافة للسلة'}
+                        >
+                            <span className={styles.buttonIcon}>
+                                {isInCart ? '✓' : '🛒'}
+                            </span>
+                            {isInCart ? 'في السلة' : 'إضافة للسلة'}
+                        </button>
+                    </div>
                 </div>
 
-                <div className={styles.actions}>
-                    <button
-                        className={styles.addToCartBtn}
-                        onClick={handleAddToCart}
-                        disabled={product.stock === 0}
-                    >
-                        {product.stock === 0 ? 'Out of stock' : 'Add to cart'}
-                    </button>
-                    {cartItem && (
-                        <span className={styles.cartQuantity}>
-                            في السلة: {cartItem.quantity}
-                        </span>
-                    )}
+                {/* إشارة المخزون */}
+                {product.stock < 5 && product.stock > 0 && (
+                    <div className={styles.lowStockBadge}>
+                        متبقي {product.stock}
+                    </div>
+                )}
+
+                {product.stock === 0 && (
+                    <div className={styles.outOfStockBadge}>
+                        نفد المخزون
+                    </div>
+                )}
+            </div>
+
+            <div className={styles.productInfo}>
+                <h3 className={styles.productName}>{product.name}</h3>
+                <p className={styles.productDescription}>{product.description}</p>
+
+                <div className={styles.priceContainer}>
+                    <span className={styles.price}>{formatPrice(product.price)} جنيه</span>
+                    <span className={styles.category}>{product.category}</span>
                 </div>
             </div>
         </div>
     );
-}
+};
+
+export default ProductCard;

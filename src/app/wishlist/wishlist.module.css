@@ -1,0 +1,144 @@
+/* wishlist.module.css */
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    direction: rtl;
+    min-height: 80vh;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 20px 0;
+}
+
+.title {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: #666;
+    margin: 0;
+}
+
+/* Empty Wishlist Styles */
+.emptyWishlist {
+    text-align: center;
+    padding: 60px 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.emptyIcon {
+    font-size: 5rem;
+    color: #ddd;
+    margin-bottom: 20px;
+}
+
+.emptyWishlist h2 {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.emptyWishlist p {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.shopNowBtn {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+.shopNowBtn:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+}
+
+/* Wishlist Items */
+.wishlistItems {
+    display: grid;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.actions {
+    text-align: center;
+    padding: 20px 0;
+    border-top: 2px solid #f0f0f0;
+}
+
+.continueShoppingBtn {
+    background: transparent;
+    color: #007bff;
+    border: 2px solid #007bff;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.continueShoppingBtn:hover {
+    background: #007bff;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    .emptyWishlist {
+        padding: 40px 15px;
+    }
+
+    .emptyIcon {
+        font-size: 4rem;
+    }
+
+    .emptyWishlist h2 {
+        font-size: 1.5rem;
+    }
+
+    .emptyWishlist p {
+        font-size: 1rem;
+    }
+
+    .shopNowBtn,
+    .continueShoppingBtn {
+        padding: 12px 24px;
+        font-size: 1rem;
+    }
+}

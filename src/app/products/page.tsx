@@ -167,7 +167,7 @@ export default function ProductsPage() {
                                 spaceBetween: 25,
                             },
                             1200: {
-                                slidesPerView: 3,
+                                slidesPerView: 4,
                                 spaceBetween: 30,
                             },
                         }}
@@ -198,3 +198,8 @@ export default function ProductsPage() {
         </div>
     );
 }
+
+
+
+
+
