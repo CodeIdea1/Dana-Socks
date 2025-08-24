@@ -3,7 +3,13 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Product, useCart } from '@/contexts/CartContext';
+import { useCart } from '@/contexts/CartContext';
+import {
+    convertFirebaseProductData,
+    getProductImages,
+    handleImageError as utilsHandleImageError,
+    ExtendedProduct
+} from '@/utils/firebaseHelpers';
 import styles from './ProductDetails.module.css';
 
 interface ProductDetailsClientProps {
@@ -11,7 +17,7 @@ interface ProductDetailsClientProps {
 }
 
 export default function ProductDetailsClient({ productId }: ProductDetailsClientProps) {
-    const [product, setProduct] = useState<Product | null>(null);
+    const [product, setProduct] = useState<ExtendedProduct | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [selectedImage, setSelectedImage] = useState(0);
@@ -37,33 +43,10 @@ export default function ProductDetailsClient({ productId }: ProductDetailsClient
                     return;
                 }
 
-                const data = productDoc.data();
-                // معالجة الصور الإضافية من Firebase
-                let additionalImages: string[] = [];
-                if (data.additionalImages) {
-                    if (Array.isArray(data.additionalImages)) {
-                        additionalImages = data.additionalImages;
-                    } else if (typeof data.additionalImages === 'object') {
-                        // تحويل Object إلى Array
-                        additionalImages = Object.values(data.additionalImages).filter((img): img is string =>
-                            typeof img === 'string' && img.trim() !== ''
-                        );
-                    }
-                }
-
-                const productData = {
-                    id: productDoc.id,
-                    name: data.name || 'غير محدد',
-                    description: data.description || '',
-                    price: Number(data.price) || 0,
-                    stock: Number(data.stock) || 0,
-                    category: data.category || 'غير مصنف',
-                    imageUrl: data.imageUrl || data.image || '',
-                    additionalImages: additionalImages,
-                    createdAt: data.createdAt || ''
-                } as Product & { additionalImages?: string[] };
-
+                // استخدام utility function لتحويل البيانات - أكثر قوة ومرونة
+                const productData = convertFirebaseProductData(productDoc.id, productDoc.data());
                 setProduct(productData);
+
             } catch (error) {
                 console.error('Error fetching product:', error);
                 setError('حدث خطأ أثناء تحميل المنتج');
@@ -92,47 +75,16 @@ export default function ProductDetailsClient({ productId }: ProductDetailsClient
     };
 
     const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-        const target = e.target as HTMLImageElement;
-        target.src = '/placeholder.png';
+        // استخدام utility function محسنة لمعالجة الأخطاء
+        utilsHandleImageError(e);
     };
 
     const handleGoBack = () => {
         router.back();
     };
 
-    // دالة للحصول على الصور
-    const getProductImages = () => {
-        if (!product) return [];
-
-        const images: string[] = [];
-
-        // إضافة الصورة الرئيسية
-        if (product.imageUrl && product.imageUrl.trim() !== '') {
-            images.push(product.imageUrl);
-        }
-
-        // إضافة الصور الإضافية إذا كانت متوفرة
-        if ('additionalImages' in product && Array.isArray(product.additionalImages)) {
-            const validImages = product.additionalImages.filter(img =>
-                img && typeof img === 'string' && img.trim() !== ''
-            );
-            images.push(...validImages);
-        }
-
-        // إذا لم توجد صور إضافية، أضف الصورة الرئيسية مرتين للعرض
-        if (images.length === 1 && product.imageUrl) {
-            images.push(product.imageUrl, product.imageUrl);
-        }
-
-        // إذا لم توجد أي صور، أضف صورة افتراضية
-        if (images.length === 0) {
-            images.push('/placeholder.png');
-        }
-
-        return images;
-    };
-
-    const productImages = getProductImages();
+    // استخدام utility function للحصول على الصور - معالجة أفضل للحالات المختلفة
+    const productImages = product ? getProductImages(product) : [];
 
     if (loading) {
         return (

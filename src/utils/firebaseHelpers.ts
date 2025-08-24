@@ -13,13 +13,19 @@ export interface FirebaseProductData {
     createdAt?: string | any;
 }
 
+// تعريف نوع المنتج الموسع
+export interface ExtendedProduct extends Product {
+    additionalImages: string[];
+    createdAt?: string;
+}
+
 /**
  * تحويل بيانات المنتج من Firebase إلى النوع المطلوب
  */
 export function convertFirebaseProductData(
     id: string, 
     data: FirebaseProductData
-): Product & { additionalImages: string[] } {
+): ExtendedProduct {
     // معالجة الصور الإضافية
     const additionalImages = processAdditionalImages(data.additionalImages);
     
