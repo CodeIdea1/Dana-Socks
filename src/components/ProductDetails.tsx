@@ -10,8 +10,14 @@ interface ProductDetailsClientProps {
     productId: string;
 }
 
+// تعريف نوع المنتج مع الصور الإضافية
+interface ProductWithImages extends Product {
+    additionalImages?: string[];
+    createdAt?: string;
+}
+
 export default function ProductDetailsClient({ productId }: ProductDetailsClientProps) {
-    const [product, setProduct] = useState<Product | null>(null);
+    const [product, setProduct] = useState<ProductWithImages | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [selectedImage, setSelectedImage] = useState(0);
@@ -38,7 +44,7 @@ export default function ProductDetailsClient({ productId }: ProductDetailsClient
                 }
 
                 const data = productDoc.data();
-                const productData = {
+                const productData: ProductWithImages = {
                     id: productDoc.id,
                     name: data.name || 'غير محدد',
                     description: data.description || '',
@@ -46,10 +52,10 @@ export default function ProductDetailsClient({ productId }: ProductDetailsClient
                     stock: Number(data.stock) || 0,
                     category: data.category || 'غير مصنف',
                     imageUrl: data.imageUrl || data.image || '',
-                    // صور إضافية (إذا كانت متوفرة)
-                    additionalImages: data.additionalImages || [],
+                    // التأكد من أن الصور الإضافية هي مصفوفة من النصوص
+                    additionalImages: Array.isArray(data.additionalImages) ? data.additionalImages : [],
                     createdAt: data.createdAt || ''
-                } as Product & { additionalImages?: string[] };
+                };
 
                 setProduct(productData);
             } catch (error) {
@@ -94,8 +100,8 @@ export default function ProductDetailsClient({ productId }: ProductDetailsClient
 
         const images = [product.imageUrl];
 
-        // إضافة الصور الإضافية إذا كانت متوفرة
-        if ('additionalImages' in product && product.additionalImages) {
+        // إضافة الصور الإضافية إذا كانت متوفرة ومصفوفة صالحة
+        if (product.additionalImages && Array.isArray(product.additionalImages)) {
             images.push(...product.additionalImages);
         } else {
             // إضافة صور افتراضية إضافية للعرض
