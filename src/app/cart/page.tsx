@@ -1,6 +1,4 @@
 'use client';
-
-// app/cart/page.tsx
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -24,13 +22,13 @@ export default function CartPage() {
         return (
             <div className={styles.container}>
                 <div className={styles.empty}>
-                    <h2>السلة فارغة</h2>
-                    <p>لم تقم بإضافة أي منتجات إلى السلة بعد</p>
+                    <h2>Cart is Empty</h2>
+                    <p>You haven't added any products to your cart yet</p>
                     <button
                         onClick={() => router.push('/products')}
                         className={styles.shopNowBtn}
                     >
-                        تسوق الآن
+                        Shop Now
                     </button>
                 </div>
             </div>
@@ -40,14 +38,14 @@ export default function CartPage() {
     return (
         <div className={styles.container}>
             <div className={styles.header}>
-                <h1 className={styles.title}>سلة التسوق</h1>
-                <p className={styles.itemCount}>{cartItems.length} منتج في السلة</p>
+                <h1 className={styles.title}>Shopping Cart</h1>
+                <p className={styles.itemCount}>{cartItems.length} items in cart</p>
             </div>
 
             <div className={styles.cartContent}>
                 <div className={styles.cartItems}>
                     {cartItems
-                        .filter(item => item.product) // Filter out items without product
+                        .filter(item => item.product)
                         .map(item => (
                             <CartItem
                                 key={item.product!.id}
@@ -58,35 +56,35 @@ export default function CartPage() {
                 </div>
 
                 <div className={styles.cartSummary}>
-                    <h3 className={styles.summaryTitle}>ملخص الطلب</h3>
+                    <h3 className={styles.summaryTitle}>Order Summary</h3>
 
                     <div className={styles.summaryRow}>
-                        <span>المجموع الفرعي:</span>
-                        <span>{getTotalPrice()} ج.م</span>
+                        <span>Subtotal:</span>
+                        <span>${getTotalPrice()}</span>
                     </div>
 
                     <div className={styles.summaryRow}>
-                        <span>الشحن:</span>
-                        <span>مجاني</span>
+                        <span>Shipping:</span>
+                        <span>Free</span>
                     </div>
 
                     <div className={`${styles.summaryRow} ${styles.total}`}>
-                        <span>المجموع الإجمالي:</span>
-                        <span>{getTotalPrice()} ج.م</span>
+                        <span>Total:</span>
+                        <span>${getTotalPrice()}</span>
                     </div>
 
                     <button
                         onClick={handleCheckout}
                         className={styles.checkoutBtn}
                     >
-                        {user ? 'إتمام الطلب' : 'تسجيل الدخول للطلب'}
+                        {user ? 'Proceed to Checkout' : 'Login to Order'}
                     </button>
 
                     <button
                         onClick={() => router.push('/products')}
                         className={styles.continueBtn}
                     >
-                        متابعة التسوق
+                        Continue Shopping
                     </button>
                 </div>
             </div>

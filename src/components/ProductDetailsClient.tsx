@@ -26,7 +26,6 @@ export default function ProductDetailsClient({ productId }: ProductDetailsClient
     const { addToCart, addToWishlist, wishlistItems, cartItems } = useCart();
     const router = useRouter();
 
-    // تحديد ما إذا كان المنتج في المفضلة أم لا
     const isInWishlist = product ? wishlistItems.some(item => item.id === product.id) : false;
     const cartItem = product ? cartItems.find(item => item.product?.id === product.id) : null;
 
@@ -39,17 +38,16 @@ export default function ProductDetailsClient({ productId }: ProductDetailsClient
                 const productDoc = await getDoc(doc(db, 'products', productId));
 
                 if (!productDoc.exists()) {
-                    setError('المنتج غير موجود');
+                    setError('Product not found');
                     return;
                 }
 
-                // استخدام utility function لتحويل البيانات - أكثر قوة ومرونة
                 const productData = convertFirebaseProductData(productDoc.id, productDoc.data());
                 setProduct(productData);
 
             } catch (error) {
                 console.error('Error fetching product:', error);
-                setError('حدث خطأ أثناء تحميل المنتج');
+                setError('Error loading product');
             } finally {
                 setLoading(false);
             }
@@ -75,7 +73,6 @@ export default function ProductDetailsClient({ productId }: ProductDetailsClient
     };
 
     const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-        // استخدام utility function محسنة لمعالجة الأخطاء
         utilsHandleImageError(e);
     };
 
@@ -83,7 +80,6 @@ export default function ProductDetailsClient({ productId }: ProductDetailsClient
         router.back();
     };
 
-    // استخدام utility function للحصول على الصور - معالجة أفضل للحالات المختلفة
     const productImages = product ? getProductImages(product) : [];
 
     if (loading) {
@@ -91,7 +87,7 @@ export default function ProductDetailsClient({ productId }: ProductDetailsClient
             <div className={styles.container}>
                 <div className={styles.loading}>
                     <div className={styles.spinner}></div>
-                    <p>جاري تحميل تفاصيل المنتج...</p>
+                    <p>Loading product details...</p>
                 </div>
             </div>
         );
@@ -101,10 +97,15 @@ export default function ProductDetailsClient({ productId }: ProductDetailsClient
         return (
             <div className={styles.container}>
                 <div className={styles.error}>
-                    <h2>⚠️ خطأ</h2>
+                    <h2>⚠️ Error</h2>
                     <p>{error}</p>
-                    <button onClick={handleGoBack} className={styles.backButton}>
-                        العودة للخلف
+                    <button
+                        type="button"
+                        onClick={handleGoBack}
+                        className={styles.backButton}
+                        aria-label="Go back"
+                    >
+                        Go Back
                     </button>
                 </div>
             </div>
@@ -113,15 +114,17 @@ export default function ProductDetailsClient({ productId }: ProductDetailsClient
 
     return (
         <div className={styles.container}>
-            {/* زر العودة */}
-            <button onClick={handleGoBack} className={styles.backButton}>
-                ← العودة
+            <button
+                type="button"
+                onClick={handleGoBack}
+                className={styles.backButton}
+                aria-label="Go back"
+            >
+                ← Back
             </button>
 
             <div className={styles.productDetails}>
-                {/* قسم الصور */}
                 <div className={styles.imageSection}>
-                    {/* الصورة الرئيسية */}
                     <div className={styles.mainImageContainer}>
                         <img
                             src={productImages[selectedImage] || '/placeholder.png'}
@@ -130,17 +133,16 @@ export default function ProductDetailsClient({ productId }: ProductDetailsClient
                             onError={handleImageError}
                         />
 
-                        {/* زر المفضلة على الصورة */}
                         <button
+                            type="button"
                             className={`${styles.wishlistBtn} ${isInWishlist ? styles.active : ''}`}
                             onClick={handleAddToWishlist}
-                            aria-label={isInWishlist ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}
+                            aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
                         >
                             ♥
                         </button>
                     </div>
 
-                    {/* الصور المصغرة */}
                     {productImages.length > 1 && (
                         <div className={styles.thumbnails}>
                             {productImages.map((image, index) => (
@@ -151,7 +153,7 @@ export default function ProductDetailsClient({ productId }: ProductDetailsClient
                                 >
                                     <img
                                         src={image || '/placeholder.png'}
-                                        alt={`${product.name} - صورة ${index + 1}`}
+                                        alt={`${product.name} - Image ${index + 1}`}
                                         onError={handleImageError}
                                     />
                                 </div>
@@ -160,40 +162,40 @@ export default function ProductDetailsClient({ productId }: ProductDetailsClient
                     )}
                 </div>
 
-                {/* قسم التفاصيل */}
                 <div className={styles.detailsSection}>
                     <div className={styles.productInfo}>
                         <h1 className={styles.productName}>{product.name}</h1>
 
                         <div className={styles.category}>
-                            <span>التصنيف: {product.category}</span>
+                            <span>Category: {product.category}</span>
                         </div>
 
                         <div className={styles.price}>
-                            <span className={styles.priceValue}>{product.price} ج.م</span>
+                            <span className={styles.priceValue}>{product.price} EGP</span>
                         </div>
 
                         <div className={styles.stock}>
                             <span className={`${styles.stockValue} ${product.stock > 0 ? styles.inStock : styles.outOfStock}`}>
-                                {product.stock > 0 ? `متوفر: ${product.stock} قطعة` : 'غير متوفر'}
+                                {product.stock > 0 ? `In Stock: ${product.stock} pcs` : 'Out of Stock'}
                             </span>
                         </div>
 
                         <div className={styles.description}>
-                            <h3>وصف المنتج:</h3>
-                            <p>{product.description || 'لا يوجد وصف متاح'}</p>
+                            <h3>Product Description:</h3>
+                            <p>{product.description || 'No description available'}</p>
                         </div>
                     </div>
 
-                    {/* أدوات التحكم */}
                     <div className={styles.controls}>
                         {product.stock > 0 && (
                             <div className={styles.quantitySelector}>
-                                <label htmlFor="quantity">الكمية:</label>
+                                <label htmlFor="quantity">Quantity:</label>
                                 <div className={styles.quantityControls}>
                                     <button
+                                        type="button"
                                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
                                         disabled={quantity <= 1}
+                                        aria-label="Decrease quantity"
                                     >
                                         -
                                     </button>
@@ -207,8 +209,10 @@ export default function ProductDetailsClient({ productId }: ProductDetailsClient
                                         className={styles.quantityInput}
                                     />
                                     <button
+                                        type="button"
                                         onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
                                         disabled={quantity >= product.stock}
+                                        aria-label="Increase quantity"
                                     >
                                         +
                                     </button>
@@ -218,16 +222,18 @@ export default function ProductDetailsClient({ productId }: ProductDetailsClient
 
                         <div className={styles.actions}>
                             <button
+                                type="button"
                                 className={styles.addToCartBtn}
                                 onClick={handleAddToCart}
                                 disabled={product.stock === 0}
+                                aria-label="Add to cart"
                             >
-                                {product.stock === 0 ? 'غير متوفر' : `إضافة ${quantity} إلى السلة`}
+                                {product.stock === 0 ? 'Out of Stock' : `Add ${quantity} to Cart`}
                             </button>
 
                             {cartItem && (
                                 <div className={styles.cartInfo}>
-                                    <span>في السلة: {cartItem.quantity} قطعة</span>
+                                    <span>In Cart: {cartItem.quantity} pcs</span>
                                 </div>
                             )}
                         </div>

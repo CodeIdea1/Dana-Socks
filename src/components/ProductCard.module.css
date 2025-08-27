@@ -1,10 +1,9 @@
-/* ProductCard.module.css */
+.container {
+    padding: 30px 0;
+}
 
 .productCard {
-    background: white;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
     transition: all 0.3s ease;
     height: 100%;
     display: flex;
@@ -14,7 +13,6 @@
 
 .productCard:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 .imageContainer {
@@ -22,7 +20,7 @@
     width: 100%;
     height: 250px;
     overflow: hidden;
-    background-color: #f8f9fa;
+    background-color: #c5c5c5;
 }
 
 .productImage {
@@ -58,12 +56,20 @@
     visibility: visible;
 }
 
+
+
 .buttonGroup {
     display: flex;
     flex-direction: column;
     gap: 12px;
     align-items: center;
     padding: 20px;
+    transform: translateY(-50px);
+    transition: .8s;
+}
+
+.productCard:hover .buttonGroup {
+    transform: translateY(0);
 }
 
 /* أزرار الهوفر */
@@ -75,7 +81,6 @@
     gap: 8px;
     padding: 12px 20px;
     border: none;
-    border-radius: 25px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -165,6 +170,7 @@
     z-index: 3;
     color: #666;
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -188,11 +194,12 @@
 
 /* معلومات المنتج */
 .productInfo {
-    padding: 20px;
+    padding: 20px 0;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    background-color: transparent;
 }
 
 .productName {
@@ -288,7 +295,7 @@
         position: absolute;
         bottom: 0;
         top: auto;
-        height: auto;
+        height: 100%;
         padding: 10px 0;
     }
 

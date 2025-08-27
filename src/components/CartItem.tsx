@@ -1,6 +1,4 @@
 'use client';
-
-// components/CartItem.tsx
 import { CartItem as CartItemType, useCart } from '@/contexts/CartContext';
 import styles from './CartItem.module.css';
 
@@ -12,8 +10,8 @@ export default function CartItem({ item }: CartItemProps) {
     const { updateQuantity, removeFromCart } = useCart();
 
     const handleQuantityChange = (newQuantity: number) => {
-        // استخدام optional chaining والnullish coalescing
         const productId = item.product?.id;
+
         if (!productId) {
             console.error('Product or Product ID is undefined');
             return;
@@ -26,11 +24,10 @@ export default function CartItem({ item }: CartItemProps) {
         }
     };
 
-    // التحقق من وجود product قبل عرض المكون
     if (!item.product) {
         return (
             <div className={styles.cartItem}>
-                <div className={styles.error}>خطأ: المنتج غير موجود</div>
+                <div className={styles.error}>Error: Product not found</div>
             </div>
         );
     }
@@ -40,15 +37,15 @@ export default function CartItem({ item }: CartItemProps) {
             <div className={styles.productImage}>
                 <img
                     src={item.product?.imageUrl || '/placeholder-image.jpg'}
-                    alt={item.product?.name || 'منتج'}
+                    alt={item.product?.name || 'Product'}
                     className={styles.image}
                 />
             </div>
 
             <div className={styles.productDetails}>
-                <h3 className={styles.productName}>{item.product?.name || 'اسم المنتج غير متوفر'}</h3>
+                <h3 className={styles.productName}>{item.product?.name || 'Product name not available'}</h3>
                 <p className={styles.productDescription}>{item.product?.description || ''}</p>
-                <div className={styles.price}>{item.product?.price || 0} ج.م</div>
+                <div className={styles.price}>{item.product?.price || 0} LE</div>
             </div>
 
             <div className={styles.quantityControls}>
@@ -68,7 +65,7 @@ export default function CartItem({ item }: CartItemProps) {
             </div>
 
             <div className={styles.itemTotal}>
-                {(item.product?.price || 0) * item.quantity} ج.م
+                {(item.product?.price || 0) * item.quantity} LE
             </div>
 
             <button
@@ -78,7 +75,7 @@ export default function CartItem({ item }: CartItemProps) {
                 }}
                 className={styles.removeBtn}
             >
-                حذف
+                Remove
             </button>
         </div>
     );

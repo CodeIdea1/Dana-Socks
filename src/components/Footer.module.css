@@ -1,0 +1,280 @@
+.footer {
+    position: relative;
+    min-height: 600px;
+    background-color: #f8f9fa;
+}
+
+/* الجزء العلوي الأبيض */
+.topSection {
+    background-color: #f8f9fa;
+    padding: 80px 0;
+    position: relative;
+}
+
+/* الجزء السفلي الأحمر */
+.bottomSection {
+    background: #3d73b6;
+    color: white;
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
+    border-top-left-radius: 60px;
+}
+
+.backgroundText {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(100px, 12vw, 160px);
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.1);
+    letter-spacing: 0.1em;
+    user-select: none;
+    pointer-events: none;
+    z-index: 1;
+    white-space: nowrap;
+}
+
+.container {
+    max-width: 1300px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+/* محتوى الجزء العلوي */
+.topContent {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 80px;
+    align-items: start;
+}
+
+.getInTouch {
+    max-width: 400px;
+}
+
+.getInTouch h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 20px 0;
+    color: #333;
+    letter-spacing: 1px;
+}
+
+.getInTouch p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0 0 40px 0;
+    color: #666;
+}
+
+.contactInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.contactItem {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 16px;
+    color: #333;
+}
+
+.contactIcon {
+    width: 24px;
+    height: 24px;
+    background: #3d73b6;
+    ;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.contactIcon svg {
+    width: 14px;
+    height: 14px;
+    color: white;
+}
+
+/* نموذج الاتصال في المنتصف */
+.contactFormWrapper {
+    position: absolute;
+    top: 90px;
+    right: 140px;
+    z-index: 10;
+    width: 500px;
+}
+
+/* محتوى الجزء السفلي */
+.bottomContent {
+    display: flex;
+    padding: 50px 0;
+}
+
+.brandSection {
+    display: flex;
+    align-items: center;
+}
+
+.brandSection h1 {
+    font-size: 64px;
+    font-weight: 900;
+    margin: 0 0 20px 0;
+    color: white;
+    letter-spacing: 3px;
+}
+
+.brandSection p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0 0 40px 0;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 550px;
+}
+
+.aboutSection {
+    margin-top: 30px;
+}
+
+.aboutTitle {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 15px 0;
+    color: white;
+    letter-spacing: 1px;
+}
+
+.aboutText {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 520px;
+}
+
+/* القائمة السفلية */
+.bottomNav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    margin-top: 20px;
+}
+
+.navLink {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.navLink:hover {
+    color: white;
+    transform: translateY(-2px);
+}
+
+.navLink::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: white;
+    transition: width 0.3s ease;
+}
+
+.navLink:hover::after {
+    width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+
+    .topContent,
+    .bottomContent {
+        gap: 60px;
+    }
+
+    .contactFormWrapper {
+        width: 350px;
+    }
+
+    .brandSection h1 {
+        font-size: 48px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .topContent,
+    .bottomContent {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .contactFormWrapper {
+        position: relative;
+        top: 0;
+        right: 0;
+        width: 100%;
+        max-width: 500px;
+        margin: 40px auto 0;
+    }
+
+    .topSection,
+    .bottomSection {
+        padding: 60px 20px;
+    }
+
+    .brandSection h1 {
+        font-size: 36px;
+    }
+
+    .backgroundText {
+        font-size: clamp(60px, 15vw, 100px);
+    }
+}
+
+@media (max-width: 480px) {
+
+    .topSection,
+    .bottomSection {
+        padding: 40px 15px;
+        border-top-left-radius: 30px;
+    }
+
+    .getInTouch {
+        max-width: 95%;
+        width: 95%;
+        margin: auto;
+    }
+
+    .getInTouch h2 {
+        font-size: 24px;
+    }
+
+    .brandSection h1 {
+        font-size: 28px;
+    }
+
+    .bottomNav {
+        gap: 20px;
+    }
+
+    .navLink {
+        font-size: 12px;
+    }
+
+    .contactFormWrapper {
+        width: 100%;
+    }
+}

@@ -1,0 +1,358 @@
+/* Animation Keyframes */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+        max-height: 0;
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 300px;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 300px;
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+        max-height: 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+/* Main Styles */
+.showcase {
+    min-height: 100vh;
+    color: #3d74b6;
+    overflow: hidden;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+/* Image Section - Desktop */
+.imageSection {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.imageContainer {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.imageWrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.imageWrapper.active {
+    opacity: 1;
+}
+
+.image {
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.8s ease-out;
+}
+
+.imageWrapper.active .image {
+    transform: scale(1.05);
+}
+
+/* Menu Section */
+.menuSection {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 0 0 60px;
+    backdrop-filter: blur(10px);
+}
+
+.menu {
+    width: 100%;
+}
+
+.mainTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #3d74b6;
+    text-align: center;
+    position: relative;
+}
+
+.mainTitle::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background-color: #3d74b6;
+}
+
+.menuList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menuItem {
+    position: relative;
+    padding: 20px 30px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    border-bottom: 1px solid #3d73b659;
+}
+
+.backgroundSlider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #3d74b6;
+    transform: translateY(-100%);
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 1;
+}
+
+.menuItem.activeItem .backgroundSlider {
+    transform: translateY(0);
+}
+
+.itemContent {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: 0.4s;
+}
+
+.itemTitle {
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    color: #3d74b6;
+}
+
+.itemSubtitle {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    font-weight: 400;
+    line-height: 1.4;
+    transition: all 0.3s ease;
+    color: #999999;
+}
+
+.menuItem.activeItem .itemTitle {
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.menuItem.activeItem .itemSubtitle {
+    color: #f0f0f0;
+    opacity: 1;
+}
+
+.menuItem.activeItem .itemContent {
+    transform: translateX(10px);
+}
+
+/* Mobile Specific Styles */
+.expandIcon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.3s ease;
+    color: #3d74b6;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.expandIcon.rotated {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.expandedItem {
+    background-color: rgba(61, 116, 182, 0.1);
+    border-radius: 8px;
+}
+
+.expandedImageContainer {
+    width: 100%;
+    margin-top: 15px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.4s ease-out;
+    position: relative;
+}
+
+.expandedImageContainer.closing {
+    animation: slideUp 0.4s ease-in;
+    animation-fill-mode: forwards;
+}
+
+.expandedImage {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .imageSection {
+        display: none;
+    }
+
+    .menuSection {
+        padding: 40px 20px;
+        background: rgba(0, 0, 0, 0.95);
+        min-height: 50vh;
+        align-items: flex-start;
+    }
+
+    .mainTitle {
+        font-size: 1.5rem;
+        margin-bottom: 30px;
+    }
+
+    .menuItem {
+        padding: 15px 20px;
+        margin: 6px 0;
+        border-radius: 8px;
+        cursor: default;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .itemTitle {
+        font-size: 1rem;
+    }
+
+    .itemSubtitle {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .mainTitle {
+        font-size: 1.3rem;
+    }
+
+    .menuItem {
+        padding: 12px 15px;
+    }
+
+    .itemTitle {
+        font-size: 0.9rem;
+    }
+
+    .itemSubtitle {
+        font-size: 0.75rem;
+    }
+
+    .expandedImage {
+        height: 200px;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .menuItem:hover {
+        transform: none;
+    }
+
+    .menuItem:active {
+        transform: none;
+        background-color: rgba(61, 116, 182, 0.1);
+        transition: background-color 0.1s ease;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .backgroundSlider {
+        background-color: #000;
+    }
+
+    .menuItem {
+        border-bottom: 2px solid #3d74b6;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+
+    .imageWrapper,
+    .backgroundSlider,
+    .itemContent,
+    .expandIcon {
+        transition: none;
+    }
+
+    .expandedImageContainer,
+    .expandedImageContainer.closing {
+        animation: none;
+    }
+
+    .imageWrapper.active .image {
+        transform: none;
+    }
+}

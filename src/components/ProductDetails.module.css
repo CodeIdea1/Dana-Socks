@@ -5,16 +5,14 @@
     margin: 0 auto;
     padding: 20px;
     font-family: 'Cairo', Arial, sans-serif;
-    direction: rtl;
 }
 
 /* زر العودة */
 .backButton {
-    background: #007bff;
+    background: #3d74b6;
     color: white;
     border: none;
     padding: 10px 20px;
-    border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
     margin-bottom: 20px;
@@ -41,7 +39,7 @@
     width: 50px;
     height: 50px;
     border: 4px solid #f3f3f3;
-    border-top: 4px solid #007bff;
+    border-top: 4px solid#3d74b6;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -90,10 +88,8 @@
     position: relative;
     width: 100%;
     height: 500px;
-    border-radius: 12px;
     overflow: hidden;
     background: #f8f9fa;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .mainImage {
@@ -157,12 +153,12 @@
 }
 
 .thumbnail:hover {
-    border-color: #007bff;
+    border-color: #3d74b6;
     transform: translateY(-2px);
 }
 
 .thumbnail.activeThumbnail {
-    border-color: #007bff;
+    border-color: #3d74b6;
     box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
 
@@ -210,7 +206,7 @@
 .priceValue {
     font-size: 2rem;
     font-weight: bold;
-    color: #007bff;
+    color: #3d74b6;
 }
 
 .stock {
@@ -237,8 +233,6 @@
 .description {
     background: #f8f9fa;
     padding: 20px;
-    border-radius: 8px;
-    border-left: 4px solid #007bff;
 }
 
 .description h3 {
@@ -261,8 +255,6 @@
     gap: 20px;
     padding: 20px;
     background: #f8f9fa;
-    border-radius: 8px;
-    border-top: 4px solid #007bff;
 }
 
 .quantitySelector {
@@ -287,8 +279,7 @@
     width: 40px;
     height: 40px;
     border: 1px solid #ddd;
-    background: white;
-    border-radius: 6px;
+    background: transparent;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -299,9 +290,9 @@
 }
 
 .quantityControls button:hover:not(:disabled) {
-    background: #007bff;
+    background: #3d74b6;
     color: white;
-    border-color: #007bff;
+    border-color: #3d74b6;
 }
 
 .quantityControls button:disabled {
@@ -314,14 +305,13 @@
     height: 40px;
     text-align: center;
     border: 1px solid #ddd;
-    border-radius: 6px;
     font-size: 16px;
     font-weight: 600;
+    background-color: transparent;
 }
 
 .quantityInput:focus {
     outline: none;
-    border-color: #007bff;
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
@@ -332,11 +322,10 @@
 }
 
 .addToCartBtn {
-    background: #28a745;
+    background: #3d74b6;
     color: white;
     border: none;
     padding: 15px 30px;
-    border-radius: 8px;
     font-size: 1.1rem;
     font-weight: 600;
     cursor: pointer;
@@ -345,7 +334,7 @@
 }
 
 .addToCartBtn:hover:not(:disabled) {
-    background: #218838;
+    background: #3d74b6;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
 }
@@ -362,7 +351,6 @@
     padding: 10px;
     background: #d4edda;
     color: #155724;
-    border-radius: 6px;
     font-weight: 600;
 }
 
@@ -398,7 +386,7 @@
         bottom: 0;
         margin: 0 -15px;
         border-radius: 0;
-        border-top: 4px solid #007bff;
+        border-top: 4px solid#3d74b6;
         border-left: none;
         border-right: none;
         background: white;

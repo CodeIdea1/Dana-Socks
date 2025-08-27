@@ -4,6 +4,9 @@ import { Product } from '@/contexts/CartContext';
 import { useCart } from '@/contexts/CartContext';
 import styles from './ProductCard.module.css';
 
+import { Eye, ShoppingCart, Check } from "lucide-react";
+
+
 interface ProductCardProps {
     product: Product;
 }
@@ -48,79 +51,85 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     };
 
     const formatPrice = (price: number) => {
-        return new Intl.NumberFormat('ar-EG').format(price);
+        return new Intl.NumberFormat('en-EG').format(price);
     };
 
     return (
-        <div className={styles.productCard}>
-            <div className={styles.imageContainer}>
-                <img
-                    src={product.imageUrl || '/placeholder.jpg'}
-                    alt={product.name}
-                    className={styles.productImage}
-                    onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = '/placeholder.jpg';
-                    }}
-                />
+        <div className={styles.container}>
+            <div className={styles.productCard}>
+                <div className={styles.imageContainer}>
+                    <img
+                        src={product.imageUrl || '/placeholder.jpg'}
+                        alt={product.name}
+                        className={styles.productImage}
+                        onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = '/placeholder.jpg';
+                        }}
+                    />
 
-                {/* أيقونة المفضلة */}
-                <button
-                    className={`${styles.wishlistButton} ${isInWishlist ? styles.inWishlist : ''}`}
-                    onClick={handleWishlistToggle}
-                    title={isInWishlist ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}
-                >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill={isInWishlist ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                </button>
+                    {/* أيقونة المفضلة */}
+                    <button
+                        className={`${styles.wishlistButton} ${isInWishlist ? styles.inWishlist : ''}`}
+                        onClick={handleWishlistToggle}
+                        title={isInWishlist ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill={isInWishlist ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                    </button>
 
-                {/* overlay الذي يظهر عند الهوفر */}
-                <div className={styles.hoverOverlay}>
-                    <div className={styles.buttonGroup}>
-                        <button
-                            className={styles.detailsButton}
-                            onClick={handleViewDetails}
-                            title="عرض التفاصيل"
-                        >
-                            <span className={styles.buttonIcon}>👁️</span>
-                            انقر لعرض التفاصيل
-                        </button>
+                    {/* overlay الذي يظهر عند الهوفر */}
+                    <div className={styles.hoverOverlay}>
 
-                        <button
-                            className={`${styles.addToCartButton} ${isInCart ? styles.inCart : ''}`}
-                            onClick={handleCartToggle}
-                            title={isInCart ? 'إزالة من السلة' : 'إضافة للسلة'}
-                        >
-                            <span className={styles.buttonIcon}>
-                                {isInCart ? '✓' : '🛒'}
-                            </span>
-                            {isInCart ? 'في السلة' : 'إضافة للسلة'}
-                        </button>
+                        <div className={styles.buttonGroup}>
+                            <button
+                                className={styles.detailsButton}
+                                onClick={handleViewDetails}
+                                title="View Details"
+                            >
+                                <span className={styles.buttonIcon}>
+                                    <Eye size={18} />
+                                </span>
+                                Click to view details
+                            </button>
+
+                            <button
+                                className={`${styles.addToCartButton} ${isInCart ? styles.inCart : ''}`}
+                                onClick={handleCartToggle}
+                                title={isInCart ? 'Remove from Cart' : 'Add to Cart'}
+                            >
+                                <span className={styles.buttonIcon}>
+                                    {isInCart ? <Check size={18} /> : <ShoppingCart size={18} />}
+                                </span>
+                                {isInCart ? 'In Cart' : 'Add to Cart'}
+                            </button>
+                        </div>
+
                     </div>
+
+                    {/* إشارة المخزون */}
+                    {product.stock < 5 && product.stock > 0 && (
+                        <div className={styles.lowStockBadge}>
+                            In stock {product.stock}
+                        </div>
+                    )}
+
+                    {product.stock === 0 && (
+                        <div className={styles.outOfStockBadge}>
+                            نفد المخزون
+                        </div>
+                    )}
                 </div>
 
-                {/* إشارة المخزون */}
-                {product.stock < 5 && product.stock > 0 && (
-                    <div className={styles.lowStockBadge}>
-                        متبقي {product.stock}
+                <div className={styles.productInfo}>
+                    <h3 className={styles.productName}>{product.name}</h3>
+                    <p className={styles.productDescription}>{product.description}</p>
+
+                    <div className={styles.priceContainer}>
+                        <span className={styles.price}>{formatPrice(product.price)} LE </span>
+                        <span className={styles.category}>{product.category}</span>
                     </div>
-                )}
-
-                {product.stock === 0 && (
-                    <div className={styles.outOfStockBadge}>
-                        نفد المخزون
-                    </div>
-                )}
-            </div>
-
-            <div className={styles.productInfo}>
-                <h3 className={styles.productName}>{product.name}</h3>
-                <p className={styles.productDescription}>{product.description}</p>
-
-                <div className={styles.priceContainer}>
-                    <span className={styles.price}>{formatPrice(product.price)} جنيه</span>
-                    <span className={styles.category}>{product.category}</span>
                 </div>
             </div>
         </div>

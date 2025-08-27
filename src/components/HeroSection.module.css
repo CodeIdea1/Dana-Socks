@@ -1,4 +1,3 @@
-/* HeroSection.module.css */
 .heroSection {
     width: 100%;
     padding: 20px 0;
@@ -104,6 +103,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    position: relative;
 }
 
 .mainImage {
@@ -168,7 +168,6 @@
     width: 80px;
     height: 80px;
     flex-shrink: 0;
-    background: #f8f9fa;
     align-items: center;
     display: flex;
     justify-content: center;
@@ -201,6 +200,33 @@
     font-weight: 700;
     color: #3d73b6;
     margin: 0;
+}
+
+/* مؤشرات السحب للجوال */
+.swipeIndicators {
+    position: absolute;
+    bottom: 15px;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    color: white;
+    z-index: 5;
+}
+
+.swipeText {
+    font-size: 12px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 4px 8px;
+    border-radius: 12px;
+}
+
+.swipeArrows {
+    display: flex;
+    gap: 15px;
+    font-size: 16px;
 }
 
 /* قسم المنتجات */
@@ -282,24 +308,154 @@
     margin: 0;
 }
 
-
 /* Responsive Design */
 @media (max-width: 768px) {
     .heroSection::after {
         width: 100%;
-        height: 50%;
-        top: 50%;
+        height: 100%;
+        top: 0;
         right: 0;
+        opacity: 0.1;
+        background-color: #3d73b6;
     }
 
     .container {
         flex-direction: column;
         text-align: center;
-        gap: 40px;
+        gap: 30px;
+        padding: 0 20px;
+    }
+
+    .heroImages {
+        width: 100%;
+    }
+
+    .heroImages.mobileFirst {
+        width: 100%;
+        order: 1;
+        align-items: center;
+        margin-bottom: 40px;
+    }
+
+    .heroText {
+        order: 2;
+        margin-top: 0;
+        max-width: none;
     }
 
     .heroTitle {
         font-size: 2.5rem;
+        margin-bottom: 15px;
+    }
+
+    .description {
+        margin-bottom: 30px;
+        font-size: 1rem;
+    }
+
+    .shopButton {
+        margin-bottom: 30px;
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .mainImageContainer {
+        width: 350px;
+        height: 350px;
+        position: relative;
+    }
+
+    .mainImage {
+        width: 100%;
+        height: 100%;
+    }
+
+    /* إخفاء مؤشرات السحب بعد فترة */
+    .swipeIndicators {
+        animation: fadeInOut 4s ease-in-out infinite;
+    }
+
+    @keyframes fadeInOut {
+
+        0%,
+        100% {
+            opacity: 0.7;
+        }
+
+        50% {
+            opacity: 0.3;
+        }
+    }
+
+    .features {
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .feature {
+        flex-direction: column;
+        text-align: center;
+        gap: 5px;
+    }
+
+    .thumbnailsWithArrow {
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+        align-items: center;
+    }
+
+    .thumbnailContainer {
+        gap: 10px;
+        width: 100%;
+        max-width: 90%;
+    }
+
+    .arrowButton {
+        display: none;
+    }
+
+    .thumbnail {
+        width: 100%;
+        max-width: 280px;
+        height: 100px;
+        padding: 10px;
+        gap: 10px;
+        margin-top: 0;
+        border-radius: 10px;
+        background-color: transparent;
+        border: 1px solid #3d73b697;
+    }
+
+    .thumbnailImageContainer {
+        width: 60px;
+        height: 60px;
+        padding: 5px;
+    }
+
+    .thumbnailImage {
+        width: 90px;
+        height: 90px;
+    }
+
+    .thumbnailName {
+        font-size: 0.8rem;
+    }
+
+    .thumbnailPrice {
+        font-size: 0.85rem;
+    }
+
+    /* تحسين النقاط المؤشرة */
+    .dotIndicators {
+        margin-top: 15px;
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .heroTitle {
+        font-size: 2rem;
     }
 
     .mainImageContainer {
@@ -308,33 +464,26 @@
     }
 
     .features {
-        justify-content: center;
+        display: none;
     }
 
-    .productGrid {
-        grid-template-columns: 1fr;
-    }
-
-    .thumbnailsWithArrow {
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .arrowButton {
-        width: 40px;
-        height: 40px;
-    }
-
-    .thumbnail {
-        width: 180px;
-        height: 70px;
-        padding: 8px;
+    .feature {
+        flex-direction: row;
         gap: 10px;
     }
 
-    .thumbnailImageContainer {
-        width: 50px;
-        height: 50px;
+    .thumbnail {
+        width: 100%;
+        max-width: 260px;
+        height: 100px;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .thumbnailInfo {
+        display: none;
     }
 
     .thumbnailName {
@@ -344,20 +493,38 @@
     .thumbnailPrice {
         font-size: 0.8rem;
     }
+
+    .swipeText {
+        font-size: 11px;
+        padding: 3px 6px;
+    }
+
+    .swipeArrows {
+        font-size: 14px;
+        gap: 12px;
+    }
 }
 
-@media (max-width: 480px) {
-    .title {
-        font-size: 2rem;
-    }
-
+/* تحسينات إضافية للأداء والتجربة */
+@media (max-width: 768px) {
     .mainImageContainer {
-        width: 250px;
-        height: 250px;
+        /* تحسين الأداء للسحب */
+        overflow: hidden;
     }
 
-    .features {
-        flex-direction: column;
-        gap: 20px;
+    .mainImage {
+        /* منع التحديد والسحب */
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* تحسين الانيميشن للسحب */
+    .mainImageContainer.swiping .mainImage {
+        transition: none;
     }
 }

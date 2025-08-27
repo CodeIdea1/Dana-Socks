@@ -3,6 +3,9 @@ import HeroSection from '../components/HeroSection';
 import ProductsPage from './products/page';
 import styles from './page.module.css';
 import Features from '@/components/Features';
+import About from '@/components/About';
+import SockShowcase from '@/components/SockShowcase';
+import Footer from '@/components/Footer';
 
 export default function Home() {
   return (
@@ -10,11 +13,9 @@ export default function Home() {
       <HeroSection />
       <Features />
       <ProductsPage />
-
-      {/* يمكنك إضافة أقسام أخرى هنا */}
-      <div className={styles.additionalContent}>
-        {/* محتوى إضافي إذا لزم الأمر */}
-      </div>
+      <About />
+      <SockShowcase />
+      <Footer />
     </div>
   );
 }

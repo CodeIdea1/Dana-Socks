@@ -276,7 +276,7 @@
     }
 
     .socialIcons {
-        gap: 10px;
+        display: none;
     }
 }
 

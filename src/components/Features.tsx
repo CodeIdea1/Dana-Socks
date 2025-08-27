@@ -90,17 +90,7 @@ const Features = () => {
             }
         });
 
-        // انيميشن معلومات "صنع في مصر"
-        ScrollTrigger.create({
-            trigger: section.querySelector(`.${styles.madeInInfo}`),
-            start: "top 85%",
-            onEnter: () => {
-                gsap.fromTo(section.querySelector(`.${styles.madeInInfo}`),
-                    { opacity: 0, scale: 0.8 },
-                    { opacity: 1, scale: 1, duration: 0.5, ease: "power2.out" }
-                );
-            }
-        });
+
 
         // انيميشن الصورة
         ScrollTrigger.create({
@@ -108,8 +98,8 @@ const Features = () => {
             start: "top 80%",
             onEnter: () => {
                 gsap.fromTo(section.querySelector(`.${styles.sock}`),
-                    { opacity: 0, scale: 0.8, rotation: -10 },
-                    { opacity: 1, scale: 1, rotation: 0, duration: 0.8, ease: "power2.out" }
+                    { opacity: 0, scale: 0.8 },
+                    { opacity: 1, scale: 1, duration: 0.8, ease: "power2.out" }
                 );
             }
         });
@@ -168,19 +158,7 @@ const Features = () => {
                             ABOUT OUR SOCKS
                         </button>
 
-                        <div className={styles.madeInInfo}>
-                            <div className={styles.mapIcon}>
-                                <img
-                                    src="madein.png"
-                                    alt="map"
-                                    className={styles.map}
-                                />
-                            </div>
-                            <div className={styles.madeText}>
-                                <span className={styles.madeLabel}>MADE IN</span><br />
-                                <span className={styles.madeLocation}>EGYPT</span>
-                            </div>
-                        </div>
+
                     </div>
 
                     {/* Right Content - Sock Image */}
@@ -195,7 +173,7 @@ const Features = () => {
                                 />
 
                                 {/* Feature Annotations */}
-                                <div className={styles.annotation} style={{ top: '18%', left: '-120px' }}>
+                                <div className={`${styles.annotation} ${styles.annotationOne}`}>
                                     <div
                                         ref={annotation1Ref}
                                         className={styles.annotationText}
@@ -204,7 +182,7 @@ const Features = () => {
                                     </div>
                                 </div>
 
-                                <div className={styles.annotation} style={{ bottom: '13%', right: '-150px' }}>
+                                <div className={`${styles.annotation} ${styles.annotationTwo}`}>
                                     <div
                                         ref={annotation2Ref}
                                         className={styles.annotationText}
@@ -213,7 +191,7 @@ const Features = () => {
                                     </div>
                                 </div>
 
-                                <div className={styles.annotation} style={{ bottom: '-95px', left: '-120px' }}>
+                                <div className={`${styles.annotation} ${styles.annotationThree}`}>
                                     <div
                                         ref={annotation3Ref}
                                         className={styles.annotationText}
@@ -221,12 +199,13 @@ const Features = () => {
                                         Cushion absorbs shock when exercising and reduces MUSCLE FATIGUE
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </section >
     );
 };
 

@@ -12,18 +12,18 @@ export default function WishlistPage() {
         return (
             <div className={styles.container}>
                 <div className={styles.header}>
-                    <h1 className={styles.title}>قائمة المفضلة</h1>
+                    <h1 className={styles.title}>Wishlist</h1>
                 </div>
 
                 <div className={styles.emptyWishlist}>
                     <div className={styles.emptyIcon}>♡</div>
-                    <h2>قائمة المفضلة فارغة</h2>
-                    <p>لم تقم بإضافة أي منتجات إلى المفضلة بعد</p>
+                    <h2>Your wishlist is empty</h2>
+                    <p>You haven't added any products to your wishlist yet</p>
                     <button
                         onClick={() => router.push('/products')}
                         className={styles.shopNowBtn}
                     >
-                        تسوق الآن
+                        Shop Now
                     </button>
                 </div>
             </div>
@@ -33,9 +33,9 @@ export default function WishlistPage() {
     return (
         <div className={styles.container}>
             <div className={styles.header}>
-                <h1 className={styles.title}>قائمة المفضلة</h1>
+                <h1 className={styles.title}>Wishlist</h1>
                 <p className={styles.subtitle}>
-                    لديك {wishlistItems.length} منتج في المفضلة
+                    You have {wishlistItems.length} items in your wishlist
                 </p>
             </div>
 
@@ -50,7 +50,7 @@ export default function WishlistPage() {
                     onClick={() => router.push('/products')}
                     className={styles.continueShoppingBtn}
                 >
-                    متابعة التسوق
+                    Continue Shopping
                 </button>
             </div>
         </div>

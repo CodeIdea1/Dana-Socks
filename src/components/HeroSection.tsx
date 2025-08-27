@@ -14,6 +14,9 @@ interface Product {
 const HeroSection = () => {
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const mainImageRef = useRef<HTMLImageElement>(null);
+    const [isMobile, setIsMobile] = useState(false);
+    const touchStartX = useRef(0);
+    const touchEndX = useRef(0);
 
     // صور المنتجات
     const products: Product[] = [
@@ -37,9 +40,58 @@ const HeroSection = () => {
         }
     ];
 
+    // التحقق من حجم الشاشة
+    useEffect(() => {
+        const checkIsMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+
+        // التحقق عند التحميل
+        checkIsMobile();
+
+        // إضافة مستمع لتغير حجم النافذة
+        window.addEventListener('resize', checkIsMobile);
+
+        return () => {
+            window.removeEventListener('resize', checkIsMobile);
+        };
+    }, []);
+
     // تبديل الصورة الرئيسية
     const handleImageSelect = (index: number) => {
         setSelectedImageIndex(index);
+    };
+
+    // معالجة بدء اللمس
+    const handleTouchStart = (e: React.TouchEvent) => {
+        if (!isMobile) return;
+        touchStartX.current = e.touches[0].clientX;
+    };
+
+    // معالجة نهاية اللمس
+    const handleTouchEnd = (e: React.TouchEvent) => {
+        if (!isMobile) return;
+        touchEndX.current = e.changedTouches[0].clientX;
+        handleSwipe();
+    };
+
+    // التعامل مع السحب
+    const handleSwipe = () => {
+        if (!isMobile) return;
+
+        const minSwipeDistance = 50; // الحد الأدنى للمسافة لاعتبارها سحباً
+        const distance = touchStartX.current - touchEndX.current;
+
+        // السحب لليسار (التالي)
+        if (distance > minSwipeDistance) {
+            const nextIndex = (selectedImageIndex + 1) % products.length;
+            setSelectedImageIndex(nextIndex);
+        }
+        // السحب لليمين (السابق)
+        else if (distance < -minSwipeDistance) {
+            const prevIndex = (selectedImageIndex - 1 + products.length) % products.length;
+            setSelectedImageIndex(prevIndex);
+        }
     };
 
     // حركة الصورة مع الماوس في الصفحة كاملة
@@ -142,6 +194,8 @@ const HeroSection = () => {
                         className={styles.mainImageContainer}
                         onMouseEnter={handleImageHover}
                         onMouseLeave={handleImageLeave}
+                        onTouchStart={handleTouchStart}
+                        onTouchEnd={handleTouchEnd}
                     >
                         <img
                             ref={mainImageRef}
@@ -149,6 +203,7 @@ const HeroSection = () => {
                             alt={products[selectedImageIndex].name}
                             className={styles.mainImage}
                         />
+
                     </div>
 
                     {/* الصور المصغرة */}

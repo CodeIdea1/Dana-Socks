@@ -1,16 +1,15 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { useEffect, useState, useMemo, useCallback } from 'react';
+import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Product } from '@/contexts/CartContext';
 import ProductCard from '@/components/ProductCard';
 import styles from './products.module.css';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-// استيراد Swiper وmodules
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, A11y, FreeMode, Mousewheel } from 'swiper/modules';
 
-// استيراد CSS الخاص بـ Swiper
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -21,93 +20,76 @@ export default function ProductsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-    // دالة تنظيف رابط الصورة
-    const cleanImageUrl = (url: string | undefined): string => {
+    const cleanImageUrl = useCallback((url: string | undefined): string => {
         if (!url) return '';
-        const cleaned = url.toString().trim();
-        return cleaned;
-    };
-
-    useEffect(() => {
-        const fetchFirebaseProducts = async () => {
-            try {
-                setLoading(true);
-                setError('');
-
-                // إنشاء استعلام مع ترتيب (اختياري)
-                const productsQuery = query(
-                    collection(db, 'products'),
-                    orderBy('createdAt', 'desc') // ترتيب بالأحدث أولاً
-                );
-
-                const productsSnapshot = await getDocs(productsQuery);
-
-                if (productsSnapshot.empty) {
-                    setError('🚫 لا توجد منتجات متاحة في قاعدة البيانات');
-                    setProducts([]);
-                    return;
-                }
-
-                const productsList = productsSnapshot.docs.map(doc => {
-                    const data = doc.data();
-
-                    const product = {
-                        category: data.category || 'غير مصنف',
-                        createdAt: data.createdAt || '',
-                        description: data.description || '',
-                        id: doc.id,
-                        // التعامل مع كل من imageUrl و image القديم
-                        imageUrl: cleanImageUrl(data.imageUrl) || cleanImageUrl(data.image) || '',
-                        name: data.name || 'غير محدد',
-                        price: Number(data.price) || 0,
-                        stock: Number(data.stock) || 0,
-                    } as Product;
-
-                    // طباعة معلومات المنتج للتشخيص
-                    console.log('Product loaded:', {
-                        id: product.id,
-                        name: product.name,
-                        imageUrl: product.imageUrl,
-                        hasValidImage: !!product.imageUrl && product.imageUrl.length > 0
-                    });
-
-                    return product;
-                });
-
-                // فلترة المنتجات المتوفرة فقط (اختياري)
-                const availableProducts = productsList.filter(product =>
-                    product.stock > 0 && product.price > 0
-                );
-
-                setProducts(availableProducts);
-
-                if (availableProducts.length === 0) {
-                    setError('📦 لا توجد منتجات متوفرة حالياً');
-                }
-
-            } catch (error) {
-                console.error('Error fetching products from Firebase:', error);
-                setError('⚠️ حدث خطأ أثناء تحميل المنتجات من قاعدة البيانات');
-                setProducts([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchFirebaseProducts();
+        return url.toString().trim();
     }, []);
 
-    // دالة إعادة المحاولة
-    const handleRetry = () => {
-        window.location.reload();
-    };
+    const availableProducts = useMemo(() => {
+        return products.filter(product =>
+            product.stock > 0 && product.price > 0
+        );
+    }, [products]);
+
+    const fetchFirebaseProducts = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError('');
+
+            const productsQuery = query(
+                collection(db, 'products'),
+                orderBy('createdAt', 'desc'),
+                limit(50)
+            );
+
+            const productsSnapshot = await getDocs(productsQuery);
+
+            if (productsSnapshot.empty) {
+                setError('No products available in database');
+                setProducts([]);
+                return;
+            }
+
+            const productsList = productsSnapshot.docs.map(doc => {
+                const data = doc.data();
+
+                return {
+                    category: data.category || 'Uncategorized',
+                    createdAt: data.createdAt || '',
+                    description: data.description || '',
+                    id: doc.id,
+                    imageUrl: cleanImageUrl(data.imageUrl) || cleanImageUrl(data.image) || '',
+                    name: data.name || 'Unknown',
+                    price: Number(data.price) || 0,
+                    stock: Number(data.stock) || 0,
+                } as Product;
+            });
+
+            setProducts(productsList);
+
+        } catch (error) {
+            console.error('Error fetching products from Firebase:', error);
+            setError('Error loading products from database');
+            setProducts([]);
+        } finally {
+            setLoading(false);
+        }
+    }, [cleanImageUrl]);
+
+    useEffect(() => {
+        fetchFirebaseProducts();
+    }, [fetchFirebaseProducts]);
+
+    const handleRetry = useCallback(() => {
+        fetchFirebaseProducts();
+    }, [fetchFirebaseProducts]);
 
     if (loading) {
         return (
             <div className={styles.container}>
                 <div className={styles.loadingOverlay}>
                     <div className={styles.loadingSpinner}>
-                        🔄 جاري تحميل المنتجات من قاعدة البيانات...
+                        Loading products...
                     </div>
                 </div>
             </div>
@@ -123,12 +105,12 @@ export default function ProductsPage() {
                         onClick={handleRetry}
                         className={styles.retryButton}
                     >
-                        🔄 إعادة المحاولة
+                        Retry
                     </button>
                 </div>
             )}
 
-            {products.length > 0 && (
+            {availableProducts.length > 0 && (
                 <div className={styles.swiperContainer}>
                     <Swiper
                         modules={[Navigation, Pagination, A11y, FreeMode, Mousewheel]}
@@ -173,33 +155,28 @@ export default function ProductsPage() {
                         }}
                         className={styles.productsSwiper}
                     >
-                        {products.map(product => (
+                        {availableProducts.map(product => (
                             <SwiperSlide key={product.id} className={styles.swiperSlide}>
                                 <ProductCard product={product} />
                             </SwiperSlide>
                         ))}
                     </Swiper>
 
-                    {/* أزرار التنقل المخصصة */}
-                    <div className={styles.swiperButtonPrev}></div>
-                    <div className={styles.swiperButtonNext}></div>
-
-                    {/* النقاط التفاعلية */}
-                    <div className={styles.swiperPagination}></div>
+                    <div className={styles.swiperButtonNext}>
+                        <ChevronRight size={20} />
+                    </div>
+                    <div className={styles.swiperButtonPrev}>
+                        <ChevronLeft size={20} />
+                    </div>
                 </div>
             )}
 
-            {!loading && !error && products.length === 0 && (
+            {!loading && !error && availableProducts.length === 0 && (
                 <div className={styles.emptyState}>
-                    <h2>🏪 لا توجد منتجات حالياً</h2>
-                    <p>سيتم إضافة منتجات جديدة قريباً</p>
+                    <h2>No products available</h2>
+                    <p>New products will be added soon</p>
                 </div>
             )}
         </div>
     );
 }
-
-
-
-
-

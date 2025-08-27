@@ -6,8 +6,6 @@
     min-height: 100vh;
     display: flex;
     align-items: center;
-    overflow-x: hidden;
-    /* Prevent horizontal scroll during animations */
 }
 
 .container {
@@ -30,7 +28,7 @@
 }
 
 .title {
-    font-size: 3.5rem;
+    font-size: 45px;
     font-weight: 400;
     color: #333;
     margin-bottom: 30px;
@@ -54,7 +52,7 @@
 
 .aboutButton {
     background: transparent;
-    border: 2px solid #333;
+    border: 1px dashed #33333376;
     color: #333;
     padding: 12px 30px;
     font-size: 0.9rem;
@@ -63,8 +61,6 @@
     cursor: pointer;
     transition: all 0.3s ease;
     margin-bottom: 20px;
-    width: 100%;
-    /* حالة أولية للانيميشن */
     opacity: 0;
     transform: translateY(20px);
 }
@@ -137,9 +133,10 @@
     height: auto;
     max-width: 280px;
     transition: transform 0.3s ease;
-    /* حالة أولية للانيميشن */
+    /*حالةأوليةللانيميشن*/
     opacity: 0;
-    transform: scale(0.8) rotate(-10deg);
+    transform: scale(0.8);
+
 }
 
 .annotation {
@@ -149,6 +146,21 @@
     gap: 15px;
     max-width: 200px;
     z-index: 2;
+}
+
+.annotationOne {
+    top: 18%;
+    left: -130px;
+}
+
+.annotationTwo {
+    bottom: 18%;
+    right: -180px;
+}
+
+.annotationThree {
+    bottom: -95px;
+    left: -120px;
 }
 
 .annotationText {
@@ -269,6 +281,8 @@
         flex-direction: column;
         gap: 50px;
         text-align: center;
+        max-width: 100%;
+        width: 100%;
     }
 
     .title {
@@ -280,12 +294,34 @@
         height: 400px;
     }
 
+    .sock {
+        width: 180px;
+    }
+
     .annotation {
         position: relative !important;
         margin: 20px 0;
         justify-content: center;
         text-align: left;
         max-width: 100%;
+    }
+
+    .annotationOne {
+        top: -73%;
+        left: -40px;
+        width: 130px;
+    }
+
+    .annotationTwo {
+        bottom: 35%;
+        left: -40px;
+        width: 130px;
+    }
+
+    .annotationThree {
+        bottom: 77%;
+        left: 79%;
+        width: 90px;
     }
 
     .annotation::before,
@@ -308,10 +344,7 @@
         height: 350px;
     }
 
-    .sockImage {
-        width: 200px;
-        height: 300px;
-    }
+
 
     .annotationText {
         font-size: 0.75rem;

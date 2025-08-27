@@ -39,7 +39,6 @@
 }
 
 .retryButton {
-    background-color: #007bff;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -63,7 +62,6 @@
 
 .loadingSpinner {
     font-size: 1.5rem;
-    background: #3d74b6;
     display: flex;
     align-items: center;
     gap: 10px;

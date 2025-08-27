@@ -27,7 +27,7 @@ interface Product {
     name: string;
     price: number;
     description?: string;
-    imageUrl?: string; // تم تغيير image إلى imageUrl
+    imageUrl?: string;
     category?: string;
     stock: number;
     createdAt?: any;
@@ -66,25 +66,36 @@ interface User {
     createdAt?: any;
 }
 
+interface Contact {
+    id: string;
+    name: string;
+    email: string;
+    phoneNumber: string;
+    comment: string;
+    status: string;
+    createdAt?: any;
+    updatedAt?: any;
+}
+
 interface NewProductForm {
     name: string;
     price: string;
     description: string;
-    imageUrl: string; // تم تغيير image إلى imageUrl
+    imageUrl: string;
     category: string;
     stock: string;
 }
 
-
-const ADMIN_EMAILS = ['sajaahmed1007@gmail.com', 'sajaahmed1007@gmail.com']; // ضع إيميلات الأدمن هنا
+const ADMIN_EMAILS = ['sajaahmed1007@gmail.com']; // ضع إيميلات الأدمن هنا
 
 export default function AdminDashboard() {
     const [user, loading, error] = useAuthState(auth);
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'users'>('products');
+    const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'users' | 'contacts'>('products');
     const [products, setProducts] = useState<Product[]>([]);
     const [orders, setOrders] = useState<Order[]>([]);
     const [users, setUsers] = useState<User[]>([]);
+    const [contacts, setContacts] = useState<Contact[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     // حالات إضافة منتج جديد
@@ -93,7 +104,7 @@ export default function AdminDashboard() {
         name: '',
         price: '',
         description: '',
-        imageUrl: '', // تم تغيير image إلى imageUrl
+        imageUrl: '',
         category: '',
         stock: ''
     });
@@ -104,6 +115,10 @@ export default function AdminDashboard() {
     // حالات عرض تفاصيل الطلب
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [showOrderDetails, setShowOrderDetails] = useState<boolean>(false);
+
+    // حالات عرض تفاصيل رسالة التواصل
+    const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+    const [showContactDetails, setShowContactDetails] = useState<boolean>(false);
 
     // التحقق من صلاحيات الأدمن
     const isAdmin = user && ADMIN_EMAILS.includes(user.email || '');
@@ -132,7 +147,6 @@ export default function AdminDashboard() {
                     name: data.name,
                     price: data.price,
                     description: data.description,
-                    // التعامل مع الحقول القديمة والجديدة للصور
                     imageUrl: data.imageUrl || data.image || '',
                     category: data.category,
                     stock: data.stock,
@@ -157,12 +171,16 @@ export default function AdminDashboard() {
                 id: doc.id,
                 ...doc.data()
             } as User));
-
-            // طباعة البيانات للتشخيص
-            console.log('Users sample data:', usersData.slice(0, 2));
-            console.log('Users fields:', usersData[0] ? Object.keys(usersData[0]) : 'No users');
-
             setUsers(usersData);
+
+            // جلب رسائل التواصل
+            const contactsQuery = query(collection(db, 'contacts'), orderBy('createdAt', 'desc'));
+            const contactsSnapshot = await getDocs(contactsQuery);
+            const contactsData: Contact[] = contactsSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            } as Contact));
+            setContacts(contactsData);
 
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -179,7 +197,7 @@ export default function AdminDashboard() {
                 name: newProduct.name,
                 price: parseFloat(newProduct.price),
                 description: newProduct.description,
-                imageUrl: newProduct.imageUrl, // تم تغيير image إلى imageUrl
+                imageUrl: newProduct.imageUrl,
                 category: newProduct.category,
                 stock: parseInt(newProduct.stock),
                 createdAt: serverTimestamp()
@@ -191,7 +209,7 @@ export default function AdminDashboard() {
                 name: '',
                 price: '',
                 description: '',
-                imageUrl: '', // تم تغيير image إلى imageUrl
+                imageUrl: '',
                 category: '',
                 stock: ''
             });
@@ -214,7 +232,7 @@ export default function AdminDashboard() {
                 name: editingProduct.name,
                 price: editingProduct.price,
                 description: editingProduct.description,
-                imageUrl: editingProduct.imageUrl, // تم تغيير image إلى imageUrl
+                imageUrl: editingProduct.imageUrl,
                 category: editingProduct.category,
                 stock: editingProduct.stock,
                 updatedAt: serverTimestamp()
@@ -259,9 +277,46 @@ export default function AdminDashboard() {
         }
     };
 
+    const updateContactStatus = async (contactId: string, newStatus: string): Promise<void> => {
+        try {
+            const contactRef = doc(db, 'contacts', contactId);
+            await updateDoc(contactRef, {
+                status: newStatus,
+                updatedAt: serverTimestamp()
+            });
+            fetchData();
+            alert('تم تحديث حالة الرسالة!');
+        } catch (error) {
+            console.error('Error updating contact status:', error);
+            alert('حدث خطأ في تحديث الرسالة');
+        }
+    };
+
+    const handleDeleteContact = async (contactId: string): Promise<void> => {
+        if (window.confirm('هل أنت متأكد من حذف هذه الرسالة؟')) {
+            try {
+                await deleteDoc(doc(db, 'contacts', contactId));
+                fetchData();
+                alert('تم حذف الرسالة بنجاح!');
+            } catch (error) {
+                console.error('Error deleting contact:', error);
+                alert('حدث خطأ في حذف الرسالة');
+            }
+        }
+    };
+
     const handleViewOrderDetails = (order: Order): void => {
         setSelectedOrder(order);
         setShowOrderDetails(true);
+    };
+
+    const handleViewContactDetails = (contact: Contact): void => {
+        setSelectedContact(contact);
+        setShowContactDetails(true);
+        // تحديث حالة الرسالة إلى "reviewed" إذا كانت "pending"
+        if (contact.status === 'pending') {
+            updateContactStatus(contact.id, 'reviewed');
+        }
     };
 
     const handleLogout = async (): Promise<void> => {
@@ -287,6 +342,27 @@ export default function AdminDashboard() {
             return 'غير محدد';
         }
     };
+
+    const getContactStatusLabel = (status: string): string => {
+        const statusMap: { [key: string]: string } = {
+            'pending': 'جديدة',
+            'reviewed': 'تمت المراجعة',
+            'replied': 'تم الرد',
+            'closed': 'مغلقة'
+        };
+        return statusMap[status] || 'غير محدد';
+    };
+
+    const getContactStatusClass = (status: string): string => {
+        const statusClasses: { [key: string]: string } = {
+            'pending': styles.statusPending,
+            'reviewed': styles.statusReviewed,
+            'replied': styles.statusReplied,
+            'closed': styles.statusClosed
+        };
+        return statusClasses[status] || '';
+    };
+
     if (loading || isLoading) {
         return (
             <div className={styles.loadingContainer}>
@@ -367,6 +443,23 @@ export default function AdminDashboard() {
                             </div>
                         </div>
                     </div>
+
+                    <div className={styles.statCard}>
+                        <div className={styles.statContent}>
+                            <div className={`${styles.statIcon} ${styles.orangeIcon}`}>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <div className={styles.statInfo}>
+                                <p className={styles.statLabel}>رسائل التواصل</p>
+                                <p className={styles.statValue}>{contacts.length}</p>
+                                <p className={styles.statSubtext}>
+                                    {contacts.filter(c => c.status === 'pending').length} جديدة
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {/* التنقل والمحتوى */}
@@ -376,7 +469,8 @@ export default function AdminDashboard() {
                             {[
                                 { id: 'products' as const, name: 'المنتجات', count: products.length },
                                 { id: 'orders' as const, name: 'الطلبات', count: orders.length },
-                                { id: 'users' as const, name: 'المستخدمين', count: users.length }
+                                { id: 'users' as const, name: 'المستخدمين', count: users.length },
+                                { id: 'contacts' as const, name: 'رسائل التواصل', count: contacts.length }
                             ].map((tab) => (
                                 <button
                                     key={tab.id}
@@ -385,6 +479,11 @@ export default function AdminDashboard() {
                                 >
                                     {tab.name}
                                     <span className={styles.tabBadge}>{tab.count}</span>
+                                    {tab.id === 'contacts' && contacts.filter(c => c.status === 'pending').length > 0 && (
+                                        <span className={styles.newBadge}>
+                                            {contacts.filter(c => c.status === 'pending').length}
+                                        </span>
+                                    )}
                                 </button>
                             ))}
                         </nav>
@@ -572,6 +671,93 @@ export default function AdminDashboard() {
                             </div>
                         </div>
                     )}
+
+                    {/* محتوى رسائل التواصل */}
+                    {activeTab === 'contacts' && (
+                        <div className={styles.tabContent}>
+                            <h2 className={styles.sectionTitle}>إدارة رسائل التواصل</h2>
+                            <div className={styles.tableContainer}>
+                                <table className={styles.table}>
+                                    <thead className={styles.tableHeader}>
+                                        <tr>
+                                            <th className={styles.tableHeaderCell}>المرسل</th>
+                                            <th className={styles.tableHeaderCell}>البريد الإلكتروني</th>
+                                            <th className={styles.tableHeaderCell}>الهاتف</th>
+                                            <th className={styles.tableHeaderCell}>الرسالة</th>
+                                            <th className={styles.tableHeaderCell}>الحالة</th>
+                                            <th className={styles.tableHeaderCell}>التاريخ</th>
+                                            <th className={styles.tableHeaderCell}>الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className={styles.tableBody}>
+                                        {contacts.map((contact) => (
+                                            <tr key={contact.id} className={styles.tableRow}>
+                                                <td className={styles.tableCell}>
+                                                    <div className={styles.contactName}>{contact.name}</div>
+                                                </td>
+                                                <td className={styles.tableCell}>
+                                                    <a href={`mailto:${contact.email}`} className={styles.emailLink}>
+                                                        {contact.email}
+                                                    </a>
+                                                </td>
+                                                <td className={styles.tableCell}>
+                                                    <a href={`tel:${contact.phoneNumber}`} className={styles.phoneLink}>
+                                                        {contact.phoneNumber}
+                                                    </a>
+                                                </td>
+                                                <td className={styles.tableCell}>
+                                                    <div className={styles.messagePreview}>
+                                                        {contact.comment.length > 50
+                                                            ? `${contact.comment.substring(0, 50)}...`
+                                                            : contact.comment
+                                                        }
+                                                    </div>
+                                                </td>
+                                                <td className={styles.tableCell}>
+                                                    <label htmlFor={`contact-status-${contact.id}`} className="sr-only">
+                                                        تغيير حالة الرسالة من {contact.name}
+                                                    </label>
+                                                    <select
+                                                        id={`contact-status-${contact.id}`}
+                                                        value={contact.status || 'pending'}
+                                                        onChange={(e) => updateContactStatus(contact.id, e.target.value)}
+                                                        className={`${styles.statusSelect} ${getContactStatusClass(contact.status)}`}
+                                                        aria-label={`حالة رسالة ${contact.name}`}
+                                                    >
+                                                        <option value="pending">جديدة</option>
+                                                        <option value="reviewed">تمت المراجعة</option>
+                                                        <option value="replied">تم الرد</option>
+                                                        <option value="closed">مغلقة</option>
+                                                    </select>
+                                                </td>
+                                                <td className={styles.tableCell}>
+                                                    {formatDate(contact.createdAt)}
+                                                </td>
+                                                <td className={styles.tableCell}>
+                                                    <div className={styles.actionButtons}>
+                                                        <button
+                                                            onClick={() => handleViewContactDetails(contact)}
+                                                            className={styles.viewButton}
+                                                            aria-label={`عرض تفاصيل رسالة ${contact.name}`}
+                                                        >
+                                                            عرض الرسالة
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeleteContact(contact.id)}
+                                                            className={styles.deleteButton}
+                                                            aria-label={`حذف رسالة ${contact.name}`}
+                                                        >
+                                                            حذف
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -610,7 +796,7 @@ export default function AdminDashboard() {
                                     placeholder="0.00"
                                     aria-describedby="new-product-price-desc"
                                 />
-                                <small id="new-product-price-desc" className="sr-only">السعر مطلوب بالريال السعودي</small>
+                                <small id="new-product-price-desc" className="sr-only">السعر مطلوب بالجنيه المصري</small>
                             </div>
                             <div className={styles.formGroup}>
                                 <label htmlFor="new-product-description" className={styles.formLabel}>الوصف</label>
@@ -714,7 +900,7 @@ export default function AdminDashboard() {
                                     placeholder="0.00"
                                     aria-describedby="edit-product-price-desc"
                                 />
-                                <small id="edit-product-price-desc" className="sr-only">السعر مطلوب بالريال السعودي</small>
+                                <small id="edit-product-price-desc" className="sr-only">السعر مطلوب بالجنيه المصري</small>
                             </div>
                             <div className={styles.formGroup}>
                                 <label htmlFor="edit-product-description" className={styles.formLabel}>الوصف</label>
@@ -836,6 +1022,92 @@ export default function AdminDashboard() {
                                 onClick={() => {
                                     setShowOrderDetails(false);
                                     setSelectedOrder(null);
+                                }}
+                                className={styles.cancelButton}
+                            >
+                                إغلاق
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* نموذج عرض تفاصيل رسالة التواصل */}
+            {showContactDetails && selectedContact && (
+                <div className={styles.modal}>
+                    <div className={styles.modalContent}>
+                        <div className={styles.modalHeader}>
+                            <h3 className={styles.modalTitle}>
+                                رسالة من {selectedContact.name}
+                            </h3>
+                        </div>
+                        <div className={styles.contactDetailsContent}>
+                            <div className={styles.contactSection}>
+                                <h4>معلومات المرسل:</h4>
+                                <div className={styles.contactInfo}>
+                                    <p><strong>الاسم:</strong> {selectedContact.name}</p>
+                                    <p><strong>البريد الإلكتروني:</strong>
+                                        <a href={`mailto:${selectedContact.email}`} className={styles.emailLink}>
+                                            {selectedContact.email}
+                                        </a>
+                                    </p>
+                                    <p><strong>رقم الهاتف:</strong>
+                                        <a href={`tel:${selectedContact.phoneNumber}`} className={styles.phoneLink}>
+                                            {selectedContact.phoneNumber}
+                                        </a>
+                                    </p>
+                                    <p><strong>تاريخ الإرسال:</strong> {formatDate(selectedContact.createdAt)}</p>
+                                    <p><strong>الحالة:</strong>
+                                        <span className={`${styles.statusBadge} ${getContactStatusClass(selectedContact.status)}`}>
+                                            {getContactStatusLabel(selectedContact.status)}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className={styles.contactSection}>
+                                <h4>محتوى الرسالة:</h4>
+                                <div className={styles.messageContent}>
+                                    <p>{selectedContact.comment}</p>
+                                </div>
+                            </div>
+
+                            <div className={styles.contactSection}>
+                                <h4>تغيير حالة الرسالة:</h4>
+                                <div className={styles.statusUpdateSection}>
+                                    <label htmlFor="contact-status-update" className={styles.formLabel}>
+                                        الحالة الحالية: {getContactStatusLabel(selectedContact.status)}
+                                    </label>
+                                    <select
+                                        id="contact-status-update"
+                                        value={selectedContact.status || 'pending'}
+                                        onChange={(e) => {
+                                            updateContactStatus(selectedContact.id, e.target.value);
+                                            setSelectedContact({ ...selectedContact, status: e.target.value });
+                                        }}
+                                        className={styles.statusSelect}
+                                    >
+                                        <option value="pending">جديدة</option>
+                                        <option value="reviewed">تمت المراجعة</option>
+                                        <option value="replied">تم الرد</option>
+                                        <option value="closed">مغلقة</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div className={styles.modalActions}>
+                            <button
+                                type="button"
+                                onClick={() => window.open(`mailto:${selectedContact.email}?subject=رد على رسالتك&body=مرحباً ${selectedContact.name}،%0A%0A`)}
+                                className={styles.replyButton}
+                            >
+                                الرد عبر البريد الإلكتروني
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setShowContactDetails(false);
+                                    setSelectedContact(null);
                                 }}
                                 className={styles.cancelButton}
                             >

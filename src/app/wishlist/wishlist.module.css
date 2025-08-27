@@ -3,7 +3,7 @@
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 60px 20px;
     direction: rtl;
     min-height: 80vh;
 }
@@ -30,7 +30,6 @@
 /* Empty Wishlist Styles */
 .emptyWishlist {
     text-align: center;
-    padding: 60px 20px;
     background: #f8f9fa;
     border-radius: 12px;
     max-width: 500px;
