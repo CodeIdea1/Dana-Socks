@@ -127,7 +127,7 @@ export default function SockShowcase() {
 
                 <div className={styles.menuSection}>
                     <div className={styles.menu}>
-                        <h2 className={styles.mainTitle}>
+                        <h2 className={`${styles.mainTitle} title`}>
                             OUR SOCK COLLECTIONS
                         </h2>
 

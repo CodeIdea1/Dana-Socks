@@ -1,5 +1,4 @@
 'use client';
-// app/auth/register/page.tsx
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -16,23 +15,23 @@ export default function RegisterPage() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [debugInfo, setDebugInfo] = useState(''); // لتتبع المشكلة
+    const [debugInfo, setDebugInfo] = useState('');
+
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-        setDebugInfo('بدء عملية التسجيل...');
+        setDebugInfo('Starting registration process...');
 
-        // التحقق من صحة البيانات
         if (password !== confirmPassword) {
-            setError('كلمات المرور غير متطابقة');
+            setError('Passwords do not match');
             setDebugInfo('');
             return;
         }
 
         if (password.length < 6) {
-            setError('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+            setError('Password must be at least 6 characters');
             setDebugInfo('');
             return;
         }
@@ -40,66 +39,62 @@ export default function RegisterPage() {
         setLoading(true);
 
         try {
-            setDebugInfo('جاري التحقق من Firebase...');
+            setDebugInfo('Checking Firebase...');
 
-            // التحقق من وجود Firebase
             if (!auth) {
-                throw new Error('Firebase Auth غير مُعرَّف');
+                throw new Error('Firebase Auth is not defined');
             }
 
-            setDebugInfo('جاري إنشاء المستخدم...');
+            setDebugInfo('Creating user...');
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            setDebugInfo('جاري حفظ بيانات المستخدم...');
+            setDebugInfo('Saving user data...');
 
-            // محاولة حفظ البيانات في Firestore (اختياري)
             try {
                 if (db) {
                     await setDoc(doc(db, 'users', user.uid), {
                         email: user.email,
                         createdAt: new Date().toISOString(),
                     });
-                    setDebugInfo('تم حفظ البيانات في Firestore بنجاح');
+                    setDebugInfo('Data saved to Firestore successfully');
                 }
             } catch (firestoreError) {
                 console.warn('Failed to save to Firestore, but user account created:', firestoreError);
-                setDebugInfo('تم إنشاء الحساب بنجاح (بدون حفظ في قاعدة البيانات)');
+                setDebugInfo('Account created successfully (without saving to database)');
             }
 
-            // النجاح - التوجه إلى صفحة المنتجات
-            setDebugInfo('تم إنشاء الحساب بنجاح! جاري التحويل...');
+            setDebugInfo('Account created successfully! Redirecting...');
 
-            // تأخير قصير لإظهار رسالة النجاح
             setTimeout(() => {
                 router.push('/products');
             }, 1000);
 
         } catch (err) {
-            let errorMessage = 'حدث خطأ أثناء إنشاء الحساب';
+            let errorMessage = 'An error occurred while creating the account';
 
             console.error('Registration error details:', err);
-            setDebugInfo(`خطأ: ${err}`);
+            setDebugInfo(`Error: ${err}`);
 
             if (err instanceof FirebaseError) {
                 switch (err.code) {
                     case 'auth/email-already-in-use':
-                        errorMessage = 'هذا البريد الإلكتروني مستخدم بالفعل';
+                        errorMessage = 'This email is already in use';
                         break;
                     case 'auth/invalid-email':
-                        errorMessage = 'البريد الإلكتروني غير صحيح';
+                        errorMessage = 'Invalid email address';
                         break;
                     case 'auth/weak-password':
-                        errorMessage = 'كلمة المرور ضعيفة جداً';
+                        errorMessage = 'Password is too weak';
                         break;
                     case 'auth/network-request-failed':
-                        errorMessage = 'مشكلة في الاتصال بالإنترنت';
+                        errorMessage = 'Network connection problem';
                         break;
                     case 'auth/too-many-requests':
-                        errorMessage = 'تم تجاوز حد المحاولات، حاول لاحقاً';
+                        errorMessage = 'Too many attempts, try again later';
                         break;
                     default:
-                        errorMessage = `خطأ Firebase: ${err.code}`;
+                        errorMessage = `Firebase error: ${err.code}`;
                 }
             } else if (err instanceof Error) {
                 errorMessage = err.message;
@@ -113,82 +108,89 @@ export default function RegisterPage() {
 
     return (
         <div className={styles.container}>
-            <div className={styles.formContainer}>
-                <h1 className={styles.title}>إنشاء حساب جديد</h1>
+            {/* Image Section */}
+            <div className={styles.imageSection}>
+                <div className={styles.imageContainer}>
+                    <img src="/socks/4.png" alt="Plant Specialist" />
 
-                {error && <div className={styles.error}>{error}</div>}
-
-                {debugInfo && (
-                    <div className={styles.debug}>
-                        🔍 {debugInfo}
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit} className={styles.form}>
-                    <div className={styles.inputGroup}>
-                        <label htmlFor="email">البريد الإلكتروني</label>
-                        <input
-                            type="email"
-                            id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            className={styles.input}
-                            disabled={loading}
-                        />
-                    </div>
-
-                    <div className={styles.inputGroup}>
-                        <label htmlFor="password">كلمة المرور (6 أحرف على الأقل)</label>
-                        <input
-                            type="password"
-                            id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            className={styles.input}
-                            minLength={6}
-                            disabled={loading}
-                        />
-                    </div>
-
-                    <div className={styles.inputGroup}>
-                        <label htmlFor="confirmPassword">تأكيد كلمة المرور</label>
-                        <input
-                            type="password"
-                            id="confirmPassword"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
-                            className={styles.input}
-                            disabled={loading}
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className={styles.submitBtn}
-                    >
-                        {loading ? 'جاري إنشاء الحساب...' : 'إنشاء حساب'}
-                    </button>
-                </form>
-
-                <div className={styles.links}>
-                    <p>
-                        لديك حساب بالفعل؟{' '}
-                        <Link href="/auth/login">تسجيل الدخول</Link>
-                    </p>
                 </div>
+            </div>
 
-                {/* رسالة مساعدة */}
-                <div className={styles.helpText}>
-                    <p>💡 تأكد من:</p>
-                    <ul>
-                        <li>الاتصال بالإنترنت</li>
-                        <li>إعداد Firebase بشكل صحيح</li>
-                        <li>تفعيل Email Authentication في Firebase</li>
-                    </ul>
+            {/* Form Section */}
+            <div className={styles.formSection}>
+                <div className={styles.formContainer}>
+                    <div className={styles.header}>
+                        <h1 className={styles.title}>Dana Socks</h1>
+                        <h2 className={styles.subtitle}>Create New Account</h2>
+                    </div>
+
+                    {error && <div className={styles.error}>{error}</div>}
+
+                    {debugInfo && (
+                        <div className={styles.debug}>
+                            🔍 {debugInfo}
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSubmit} className={styles.form}>
+                        <div className={styles.inputGroup}>
+                            <label htmlFor="email">Email Address</label>
+                            <input
+                                type="email"
+                                id="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                className={styles.input}
+                                disabled={loading}
+                                placeholder="Enter your email"
+                            />
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label htmlFor="password">Password</label>
+                            <input
+                                type="password"
+                                id="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                className={styles.input}
+                                minLength={6}
+                                disabled={loading}
+                                placeholder="At least 6 characters"
+                            />
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label htmlFor="confirmPassword">Confirm Password</label>
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                required
+                                className={styles.input}
+                                disabled={loading}
+                                placeholder="Confirm your password"
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className={styles.submitBtn}
+                        >
+                            {loading ? 'Creating Account...' : 'Create Account'}
+                        </button>
+                    </form>
+
+                    <div className={styles.links}>
+                        <p>
+                            Already have an account?{' '}
+                            <Link href="/auth/login">Sign In</Link>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

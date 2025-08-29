@@ -1,11 +1,24 @@
 /* components/Navbar.module.css */
 
 .navbar {
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     z-index: 1000;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     background: #3d74b6;
+    transform: translateY(0);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+}
+
+.navbar.visible {
+    transform: translateY(0);
+}
+
+.navbar.hidden {
+    transform: translateY(-100%);
 }
 
 .container {
@@ -16,6 +29,14 @@
     justify-content: space-between;
     align-items: center;
     height: 100%;
+    position: relative;
+}
+
+/* Hide class for search mode */
+.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
 }
 
 /* Top Bar Styles */
@@ -105,14 +126,13 @@
 
 .spacer {
     width: 70px;
-    /* To balance the layout with social icons */
 }
 
 /* Main Navigation Styles */
 .mainNav {
     background: #3d74b6;
     padding: 15px 0;
-    height: 70px;
+    height: 90px;
     border-top: 1px solid rgba(255, 255, 255, 0.204);
 }
 
@@ -120,6 +140,7 @@
     display: flex;
     align-items: center;
     gap: 30px;
+    transition: opacity 0.3s ease;
 }
 
 .navLink {
@@ -137,6 +158,7 @@
 .brand {
     flex: 1;
     text-align: center;
+    transition: opacity 0.3s ease;
 }
 
 .brand a {
@@ -150,6 +172,7 @@
     display: flex;
     align-items: center;
     gap: 20px;
+    transition: opacity 0.3s ease;
 }
 
 .iconBtn {
@@ -170,6 +193,192 @@
 .iconBtn:hover {
     background: #f8f9fa;
     color: #667eea;
+}
+
+/* Search Container Styles */
+.searchContainer {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.searchContainer.searchActive {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 600px;
+    z-index: 1001;
+}
+
+.searchInputContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 25px;
+    padding: 12px 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.searchIcon {
+    color: #666;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.searchInput {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 16px;
+    color: #333;
+    padding: 0;
+}
+
+.searchInput::placeholder {
+    color: #999;
+}
+
+.closeSearchBtn {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    margin-left: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.closeSearchBtn:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #333;
+}
+
+/* Search Results Dropdown */
+.searchDropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-top: 8px;
+    z-index: 1002;
+    backdrop-filter: blur(10px);
+}
+
+.searchLoading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px;
+    color: #666;
+}
+
+.loadingSpinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #e9ecef;
+    border-top: 2px solid #3d74b6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.searchResultItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.searchResultItem:hover {
+    background: #f8f9fa;
+    transform: translateX(4px);
+}
+
+.searchResultItem:last-child {
+    border-bottom: none;
+    border-radius: 0 0 12px 12px;
+}
+
+.searchResultItem:first-child {
+    border-radius: 12px 12px 0 0;
+}
+
+.resultImage {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #f8f9fa;
+}
+
+.resultImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.2s ease;
+}
+
+.searchResultItem:hover .resultImage img {
+    transform: scale(1.05);
+}
+
+.resultInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.resultName {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.resultPrice {
+    font-size: 13px;
+    color: #3d74b6;
+    font-weight: 500;
+}
+
+.noResults {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
 }
 
 .iconWithBadge {
@@ -245,30 +454,233 @@
     color: #667eea;
 }
 
+/* Mobile Menu Styles */
+.mobileMenuBtn {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.mobileMenuBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.mobileActions {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    transition: opacity 0.3s ease;
+}
+
+.mobileIconBtn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.729);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, color 0.2s ease;
+    text-decoration: none;
+    position: relative;
+    margin-top: 5.8px;
+}
+
+.mobileIconBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.mobileMenuOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+    opacity: 0;
+    animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+.mobileMenu {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 280px;
+    height: 100vh;
+    background: white;
+    z-index: 1002;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.mobileMenuOpen {
+    left: 0;
+}
+
+.mobileMenuContainer {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.mobileMenuHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #e9ecef;
+    background: #f8f9fa;
+}
+
+.mobileMenuHeader h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.2rem;
+    font-weight: 600;
+    font-style: normal;
+}
+
+.closeMobileMenu {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background 0.2s ease;
+}
+
+.closeMobileMenu:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.mobileMenuContent {
+    flex: 1;
+    padding: 20px 0;
+    overflow-y: auto;
+}
+
+.mobileNavLink {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 20px;
+    color: #333;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+.mobileNavLink:hover {
+    background: #f8f9fa;
+    color: #3d74b6;
+    padding-left: 25px;
+}
+
+.mobileNavLink:active {
+    background: #e9ecef;
+}
+
+.mobileDivider {
+    height: 1px;
+    background: #e9ecef;
+    margin: 15px 20px;
+}
+
+.mobileMenuFooter {
+    padding: 20px;
+    border-top: 1px solid #e9ecef;
+    background: #f8f9fa;
+}
+
+.mobileSocialLinks {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.mobileSocialLinks a {
+    color: #666;
+    padding: 10px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobileSocialLinks a:hover {
+    color: #3d74b6;
+    background: rgba(61, 116, 182, 0.1);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .container {
         padding: 0 15px;
     }
 
+    /* Hide desktop navigation */
     .leftNav {
-        gap: 20px;
-    }
-
-    .navLink {
-        font-size: 0.9rem;
-    }
-
-    .brand a {
-        font-size: 1.5rem;
+        display: none;
     }
 
     .rightNav {
-        gap: 15px;
+        display: none;
+    }
+
+    /* Show mobile elements */
+    .mobileMenuBtn {
+        display: block;
+        color: rgba(255, 255, 255, 0.746);
+        margin-top: 5.8px;
+        cursor: cell;
+    }
+
+    .mobileActions {
+        display: flex;
+    }
+
+    .brand {
+        flex: 1;
+        margin-left: 25px;
+    }
+
+    .brand a {
+        font-size: 1.8rem;
+    }
+
+    .mainNav {
+        height: 70px;
+        padding: 10px 0;
+    }
+
+    .topBar {
+        padding: 6px 0;
     }
 
     .announcementContainer {
-        width: 300px !important;
+        width: 300px;
     }
 
     .announcementText {
@@ -278,34 +690,117 @@
     .socialIcons {
         display: none;
     }
+
+    .spacer {
+        display: none;
+    }
+
+    .sliderBtn {
+        padding: 2px;
+    }
+
+    /* Mobile search adjustments */
+    .searchContainer.searchActive {
+        width: 90%;
+        max-width: none;
+    }
+
+    .searchInputContainer {
+        padding: 10px 16px;
+    }
+
+    .searchInput {
+        font-size: 16px;
+        /* Prevents zoom on iOS */
+    }
+
+    .searchDropdown {
+        max-height: 300px;
+    }
+
+    .resultImage {
+        width: 40px;
+        height: 40px;
+    }
+
+    .resultName {
+        font-size: 13px;
+    }
+
+    .resultPrice {
+        font-size: 12px;
+    }
 }
 
 @media (max-width: 480px) {
-    .leftNav {
-        gap: 15px;
+    .container {
+        padding: 0 12px;
     }
 
-    .navLink {
-        font-size: 0.85rem;
+    .brand a {
+        font-size: 1.5rem;
+    }
+
+    .mobileActions {
+        gap: 8px;
+    }
+
+    .mobileIconBtn {
+        padding: 6px;
+    }
+
+    .announcementContainer {
+        width: 220px;
+    }
+
+    .announcementText {
+        font-size: 0.75rem;
+        padding: 0 10px;
+    }
+
+    .mainNav {
+        height: 65px;
+    }
+
+    .mobileMenu {
+        width: 260px;
+    }
+
+    .topBar {
+        font-size: 0.8rem;
+    }
+
+    .searchContainer.searchActive {
+        width: 95%;
+    }
+
+    .searchInputContainer {
+        padding: 8px 14px;
+    }
+}
+
+@media (max-width: 360px) {
+    .container {
+        padding: 0 10px;
     }
 
     .brand a {
         font-size: 1.3rem;
     }
 
-    .rightNav {
-        gap: 12px;
-    }
-
-    .iconBtn {
-        padding: 6px;
-    }
-
     .announcementContainer {
-        width: 250px !important;
+        width: 180px;
     }
 
     .announcementText {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
+    }
+
+    .mobileMenu {
+        width: 240px;
+    }
+
+    .searchContainer.searchActive {
+        width: 98%;
     }
 }

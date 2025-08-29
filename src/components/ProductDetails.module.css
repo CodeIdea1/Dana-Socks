@@ -3,11 +3,10 @@
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 160px 20px 100px 20px;
     font-family: 'Cairo', Arial, sans-serif;
 }
 
-/* زر العودة */
 .backButton {
     background: #3d74b6;
     color: white;
@@ -25,7 +24,6 @@
     transform: translateY(-2px);
 }
 
-/* حالة التحميل */
 .loading {
     display: flex;
     flex-direction: column;

@@ -145,7 +145,7 @@ export default function ContactSection({ showBackButton = false, onSuccess }: Co
     return (
         <section className={styles.contactSection}>
             <div className={styles.header}>
-                <h2>Contact Us</h2>
+                <h2 className={`${styles.title} title`}>Contact Us</h2>
                 <p>We look forward to hearing your opinions and suggestions</p>
             </div>
 

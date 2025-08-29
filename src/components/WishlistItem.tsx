@@ -58,7 +58,7 @@ export default function WishlistItem({ item }: WishlistItemProps) {
 
             <div className={styles.productInfo}>
                 <div className={styles.productDetails}>
-                    <h3 className={styles.productName}>{item.name}</h3>
+                    <h3 className={`${styles.productName} title`}>{item.name}</h3>
                     <p className={styles.productDescription}>{item.description}</p>
                     <div className={styles.productMeta}>
                         <span className={styles.category}>{item.category}</span>

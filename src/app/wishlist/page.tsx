@@ -11,13 +11,10 @@ export default function WishlistPage() {
     if (wishlistItems.length === 0) {
         return (
             <div className={styles.container}>
-                <div className={styles.header}>
-                    <h1 className={styles.title}>Wishlist</h1>
-                </div>
+
 
                 <div className={styles.emptyWishlist}>
-                    <div className={styles.emptyIcon}>♡</div>
-                    <h2>Your wishlist is empty</h2>
+                    <h2 className={`${styles.emptyTitle} title`}>Wishlist is empty</h2>
                     <p>You haven't added any products to your wishlist yet</p>
                     <button
                         onClick={() => router.push('/products')}
@@ -33,7 +30,7 @@ export default function WishlistPage() {
     return (
         <div className={styles.container}>
             <div className={styles.header}>
-                <h1 className={styles.title}>Wishlist</h1>
+                <h1 className={`${styles.title} title`}>Wishlist</h1>
                 <p className={styles.subtitle}>
                     You have {wishlistItems.length} items in your wishlist
                 </p>

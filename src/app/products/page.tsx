@@ -5,6 +5,7 @@ import { db } from '@/lib/firebase';
 import { Product } from '@/contexts/CartContext';
 import ProductCard from '@/components/ProductCard';
 import styles from './products.module.css';
+import Footer from '@/components/Footer';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -15,7 +16,12 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/free-mode';
 
-export default function ProductsPage() {
+interface ProductsPageProps {
+    displayMode?: 'slider' | 'grid';
+    maxProducts?: number;
+}
+
+export default function ProductsPage({ displayMode = 'grid', maxProducts }: ProductsPageProps) {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -26,10 +32,16 @@ export default function ProductsPage() {
     }, []);
 
     const availableProducts = useMemo(() => {
-        return products.filter(product =>
+        const filtered = products.filter(product =>
             product.stock > 0 && product.price > 0
         );
-    }, [products]);
+
+        if (maxProducts) {
+            return filtered.slice(0, maxProducts);
+        }
+
+        return filtered;
+    }, [products, maxProducts]);
 
     const fetchFirebaseProducts = useCallback(async () => {
         try {
@@ -96,87 +108,128 @@ export default function ProductsPage() {
         );
     }
 
+    // Slider Mode (for Home page)
+    if (displayMode === 'slider') {
+        return (
+            <div className={styles.container} id='products'>
+                {error && (
+                    <div className={styles.warning}>
+                        <p>{error}</p>
+                        <button
+                            onClick={handleRetry}
+                            className={styles.retryButton}
+                        >
+                            Retry
+                        </button>
+                    </div>
+                )}
+
+                {availableProducts.length > 0 && (
+                    <div className={styles.swiperContainer}>
+                        <Swiper
+                            modules={[Navigation, Pagination, A11y, FreeMode, Mousewheel]}
+                            spaceBetween={10}
+                            slidesPerView="auto"
+                            freeMode={true}
+                            mousewheel={{
+                                forceToAxis: true,
+                                sensitivity: 0.5,
+                            }}
+                            grabCursor={true}
+                            navigation={{
+                                nextEl: `.${styles.swiperButtonNext}`,
+                                prevEl: `.${styles.swiperButtonPrev}`,
+                            }}
+                            pagination={{
+                                el: `.${styles.swiperPagination}`,
+                                clickable: true,
+                                dynamicBullets: true,
+                            }}
+                            breakpoints={{
+                                320: {
+                                    slidesPerView: 1,
+                                    spaceBetween: 10,
+                                },
+                                480: {
+                                    slidesPerView: 1.5,
+                                    spaceBetween: 15,
+                                },
+                                768: {
+                                    slidesPerView: 2,
+                                    spaceBetween: 20,
+                                },
+                                1024: {
+                                    slidesPerView: 2.5,
+                                    spaceBetween: 25,
+                                },
+                                1200: {
+                                    slidesPerView: 4,
+                                    spaceBetween: 30,
+                                },
+                            }}
+                            className={styles.productsSwiper}
+                        >
+                            {availableProducts.map(product => (
+                                <SwiperSlide key={product.id} className={styles.swiperSlide}>
+                                    <ProductCard product={product} />
+                                </SwiperSlide>
+                            ))}
+                        </Swiper>
+
+                        <div className={styles.swiperButtonNext}>
+                            <ChevronRight size={20} />
+                        </div>
+                        <div className={styles.swiperButtonPrev}>
+                            <ChevronLeft size={20} />
+                        </div>
+                    </div>
+                )}
+
+                {!loading && !error && availableProducts.length === 0 && (
+                    <div className={styles.emptyState}>
+                        <h2>No products available</h2>
+                        <p>New products will be added soon</p>
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    // Grid Mode (for Products page)
     return (
-        <div className={styles.container} id='products'>
-            {error && (
-                <div className={styles.warning}>
-                    <p>{error}</p>
-                    <button
-                        onClick={handleRetry}
-                        className={styles.retryButton}
-                    >
-                        Retry
-                    </button>
-                </div>
-            )}
+        <>
+            <div className={styles.container} id='products'>
+                {error && (
+                    <div className={styles.warning}>
+                        <p>{error}</p>
+                        <button
+                            onClick={handleRetry}
+                            className={styles.retryButton}
+                        >
+                            Retry
+                        </button>
+                    </div>
+                )}
 
-            {availableProducts.length > 0 && (
-                <div className={styles.swiperContainer}>
-                    <Swiper
-                        modules={[Navigation, Pagination, A11y, FreeMode, Mousewheel]}
-                        spaceBetween={10}
-                        slidesPerView="auto"
-                        freeMode={true}
-                        mousewheel={{
-                            forceToAxis: true,
-                            sensitivity: 0.5,
-                        }}
-                        grabCursor={true}
-                        navigation={{
-                            nextEl: `.${styles.swiperButtonNext}`,
-                            prevEl: `.${styles.swiperButtonPrev}`,
-                        }}
-                        pagination={{
-                            el: `.${styles.swiperPagination}`,
-                            clickable: true,
-                            dynamicBullets: true,
-                        }}
-                        breakpoints={{
-                            320: {
-                                slidesPerView: 1,
-                                spaceBetween: 10,
-                            },
-                            480: {
-                                slidesPerView: 1.5,
-                                spaceBetween: 15,
-                            },
-                            768: {
-                                slidesPerView: 2,
-                                spaceBetween: 20,
-                            },
-                            1024: {
-                                slidesPerView: 2.5,
-                                spaceBetween: 25,
-                            },
-                            1200: {
-                                slidesPerView: 4,
-                                spaceBetween: 30,
-                            },
-                        }}
-                        className={styles.productsSwiper}
-                    >
+                {availableProducts.length > 0 && (
+                    <div className={styles.productsGrid}>
                         {availableProducts.map(product => (
-                            <SwiperSlide key={product.id} className={styles.swiperSlide}>
-                                <ProductCard product={product} />
-                            </SwiperSlide>
+                            <ProductCard key={product.id} product={product} />
                         ))}
-                    </Swiper>
-
-                    <div className={styles.swiperButtonNext}>
-                        <ChevronRight size={20} />
                     </div>
-                    <div className={styles.swiperButtonPrev}>
-                        <ChevronLeft size={20} />
-                    </div>
-                </div>
-            )}
+                )}
 
-            {!loading && !error && availableProducts.length === 0 && (
-                <div className={styles.emptyState}>
-                    <h2>No products available</h2>
-                    <p>New products will be added soon</p>
-                </div>
-            )}
-        </div>
+                {!loading && !error && availableProducts.length === 0 && (
+                    <div className={styles.emptyState}>
+                        <h2>No products available</h2>
+                        <p>New products will be added soon</p>
+                    </div>
+                )}
+
+            </div>
+            <Footer />
+        </>
+
+
     );
 }

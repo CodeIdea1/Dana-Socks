@@ -9,7 +9,7 @@ export default function Footer() {
                 <div className={styles.container}>
                     <div className={styles.topContent}>
                         <div className={styles.getInTouch}>
-                            <h2>GET IN TOUCH</h2>
+                            <h2 className={`${styles.title} title`}>GET IN TOUCH</h2>
                             <p>
                                 Lorem Ipsum has been the industry's standard dummy text
                                 ever since the 1500s, when an unknown printer took a
@@ -56,20 +56,17 @@ export default function Footer() {
 
             {/* الجزء السفلي الأحمر */}
             <div className={styles.bottomSection}>
-                {/* الخلفية مع النصوص الكبيرة */}
-                <div className={styles.backgroundText}>
-                    AASHA
-                </div>
+
 
                 <div className={styles.container}>
 
 
-                    <h1>DANA</h1>
+                    <h1 className={`${styles.title} title`}>Dana Socks</h1>
                     <div className={styles.bottomContent}>
 
 
                         <div className={styles.aboutSection}>
-                            <div className={styles.aboutTitle}>ABOUT US</div>
+                            <div className={`${styles.aboutTitle} title`}>ABOUT US</div>
                             <p className={styles.aboutText}>
                                 AASHA is a team of experienced designers and strategists
                                 that we've learned a lot about the great work
@@ -78,7 +75,7 @@ export default function Footer() {
                         </div>
 
                         <div className={styles.aboutSection}>
-                            <div className={styles.aboutTitle}>ABOUT US</div>
+                            <div className={`${styles.aboutTitle} title`}>ABOUT US</div>
                             <p className={styles.aboutText}>
                                 AASHA is a team of experienced designers and strategists
                                 that we've learned a lot about the great work

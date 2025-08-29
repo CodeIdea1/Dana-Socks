@@ -1,6 +1,8 @@
 'use client';
 import { CartItem as CartItemType, useCart } from '@/contexts/CartContext';
 import styles from './CartItem.module.css';
+import { Trash2, Plus, Minus } from "lucide-react";
+
 
 interface CartItemProps {
     item: CartItemType;
@@ -43,7 +45,7 @@ export default function CartItem({ item }: CartItemProps) {
             </div>
 
             <div className={styles.productDetails}>
-                <h3 className={styles.productName}>{item.product?.name || 'Product name not available'}</h3>
+                <h3 className={`${styles.productName} title`}>{item.product?.name || 'Product name not available'}</h3>
                 <p className={styles.productDescription}>{item.product?.description || ''}</p>
                 <div className={styles.price}>{item.product?.price || 0} LE</div>
             </div>
@@ -53,14 +55,14 @@ export default function CartItem({ item }: CartItemProps) {
                     onClick={() => handleQuantityChange(item.quantity - 1)}
                     className={styles.quantityBtn}
                 >
-                    -
+                    <Minus />
                 </button>
                 <span className={styles.quantity}>{item.quantity}</span>
                 <button
                     onClick={() => handleQuantityChange(item.quantity + 1)}
                     className={styles.quantityBtn}
                 >
-                    +
+                    <Plus />
                 </button>
             </div>
 
@@ -75,7 +77,7 @@ export default function CartItem({ item }: CartItemProps) {
                 }}
                 className={styles.removeBtn}
             >
-                Remove
+                <Trash2 />
             </button>
         </div>
     );

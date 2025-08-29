@@ -4,16 +4,23 @@
     grid-template-columns: 100px 1fr auto auto auto;
     gap: 20px;
     align-items: center;
-    background: white;
+    background: rgba(255, 255, 255, 0.631);
+    border-bottom: 1px solid #3d73b66f;
     padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.cartItem:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 .productImage {
     width: 100px;
     height: 100px;
-    border-radius: 8px;
     overflow: hidden;
 }
 
@@ -31,15 +38,17 @@
 
 .productName {
     font-size: 1.2rem;
-    font-weight: 600;
+    font-weight: 600 !important;
     color: #333;
     margin: 0;
+    font-style: normal;
 }
 
 .productDescription {
     color: #666;
     font-size: 0.9rem;
     margin: 0;
+    width: 300px;
 }
 
 .price {
@@ -52,57 +61,61 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    background: #f8f9fa;
-    border-radius: 8px;
     padding: 5px;
 }
 
 .quantityBtn {
-    width: 35px;
-    height: 35px;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+
+    width: 33px;
+    height: 33px;
+    border: 1px dashed #3d74b6;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 1.2rem;
-    color: #667eea;
+    font-size: 0.2rem;
+    color: #3d74b6;
     transition: all 0.2s ease;
+    border-radius: 50%;
+    padding: 8px;
+
 }
 
 .quantityBtn:hover {
-    background: #667eea;
+    background: #3d74b6;
     color: white;
-    border-color: #667eea;
+    border-color: #3d74b6;
 }
 
 .quantity {
     min-width: 40px;
     text-align: center;
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    color: rgba(0, 0, 0, 0.872);
 }
 
 .itemTotal {
     font-size: 1.3rem;
-    font-weight: 700;
+    font-weight: 600;
     color: #333;
     text-align: center;
 }
 
 .removeBtn {
-    background: #dc3545;
-    color: white;
+    width: 33px;
+    height: 33px;
+    position: relative;
+    right: -70px;
     padding: 8px 16px;
-    border-radius: 6px;
     font-weight: 600;
-    transition: background 0.2s ease;
+    color: rgba(0, 0, 0, 0.634);
+    background-color: transparent;
 }
 
+
 .removeBtn:hover {
-    background: #c82333;
+    color: orange;
 }
 
 @media (max-width: 768px) {

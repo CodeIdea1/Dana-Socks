@@ -8,7 +8,6 @@ interface ProductPageProps {
     };
 }
 
-// مكون التحميل
 function ProductLoading() {
     return (
         <div style={{
@@ -27,7 +26,7 @@ function ProductLoading() {
                 borderRadius: '50%',
                 animation: 'spin 1s linear infinite'
             }}></div>
-            <p>جاري تحميل تفاصيل المنتج...</p>
+            <p>Loading product details...</p>
         </div>
     );
 }
@@ -42,10 +41,9 @@ export default function ProductPage({ params }: ProductPageProps) {
     );
 }
 
-// إضافة metadata للصفحة
 export async function generateMetadata({ params }: ProductPageProps) {
     return {
-        title: `تفاصيل المنتج - ${params.id}`,
-        description: 'عرض تفاصيل المنتج مع الصور والأسعار والمواصفات'
+        title: `Product Details - ${params.id}`,
+        description: 'View product details with images, prices and specifications'
     };
 }

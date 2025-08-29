@@ -1,10 +1,12 @@
-// app/layout.tsx
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { CartProvider } from '@/contexts/CartContext';
+import { ToastProvider } from '@/contexts/ToastContext';
 import Navbar from '@/components/Navbar';
+import ScrollProgressIndicator from '@/components/ScrollProgressIndicator';
+import FloatingAboutTab from '@/components/FloatingAboutTab';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -30,10 +32,14 @@ export default function RootLayout({
       <body className={`${inter.className} ${playfairDisplay.variable}`}>
         <AuthProvider>
           <CartProvider>
-            <Navbar />
-            <main style={{ minHeight: 'calc(100vh - 80px)' }}>
-              {children}
-            </main>
+            <ToastProvider>
+              <Navbar />
+              <main style={{ minHeight: 'calc(100vh - 80px)' }}>
+                {children}
+              </main>
+              <ScrollProgressIndicator />
+              <FloatingAboutTab />
+            </ToastProvider>
           </CartProvider>
         </AuthProvider>
       </body>

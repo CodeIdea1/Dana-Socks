@@ -2,6 +2,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Product } from '@/contexts/CartContext';
 import { useCart } from '@/contexts/CartContext';
+import { useToast } from '@/contexts/ToastContext';
 import styles from './ProductCard.module.css';
 
 import { Eye, ShoppingCart, Check } from "lucide-react";
@@ -13,6 +14,7 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const { addToCart, addToWishlist, removeFromWishlist, wishlistItems, cartItems, removeFromCart } = useCart();
+    const { showToast } = useToast();
     const router = useRouter();
 
     // التحقق من وجود المنتج في المفضلة
@@ -27,8 +29,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         if (isInCart) {
             removeFromCart(product.id);
+            showToast('cart-removed', product.name);
         } else {
             addToCart(product);
+            showToast('cart-added', product.name);
         }
     };
 
@@ -45,8 +49,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         if (isInWishlist) {
             removeFromWishlist(product.id);
+            showToast('wishlist-removed', product.name);
         } else {
             addToWishlist(product);
+            showToast('wishlist-added', product.name);
         }
     };
 
@@ -123,7 +129,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 </div>
 
                 <div className={styles.productInfo}>
-                    <h3 className={styles.productName}>{product.name}</h3>
+                    <h3 className={`${styles.productName} title`}>{product.name}</h3>
                     <p className={styles.productDescription}>{product.description}</p>
 
                     <div className={styles.priceContainer}>

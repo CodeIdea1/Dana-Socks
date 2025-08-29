@@ -1,9 +1,9 @@
 'use client';
-// app/auth/login/page.tsx
+
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword } from 'firebase/auth'; // ✅ التعديل هنا
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import styles from './login.module.css';
 
@@ -23,7 +23,7 @@ export default function LoginPage() {
             await signInWithEmailAndPassword(auth, email, password);
             router.push('/products');
         } catch (error: any) {
-            setError('خطأ في البريد الإلكتروني أو كلمة المرور');
+            setError('Invalid email or password');
             console.error('Login error:', error);
         } finally {
             setLoading(false);
@@ -32,50 +32,71 @@ export default function LoginPage() {
 
     return (
         <div className={styles.container}>
-            <div className={styles.formContainer}>
-                <h1 className={styles.title}>تسجيل الدخول</h1>
+            {/* Image Section */}
+            <div className={styles.imageSection}>
+                <div className={styles.imageContainer}>
+                    <img src="/socks/8.jpeg" alt="Garden Expert" />
+                    <div className={styles.imageContent}>
+                        <h2 className={`${styles.title} title`}>Welcome Back</h2>
+                        <p>Sign in to access your plant collection and expert gardening tips</p>
+                    </div>
+                </div>
+            </div>
 
-                {error && <div className={styles.error}>{error}</div>}
-
-                <form onSubmit={handleSubmit} className={styles.form}>
-                    <div className={styles.inputGroup}>
-                        <label htmlFor="email">البريد الإلكتروني</label>
-                        <input
-                            type="email"
-                            id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            className={styles.input}
-                        />
+            {/* Form Section */}
+            <div className={styles.formSection}>
+                <div className={styles.formContainer}>
+                    <div className={styles.header}>
+                        <h1 className={styles.title}>Dana Socks</h1>
+                        <h2 className={styles.subtitle}>Sign In to Your Account</h2>
                     </div>
 
-                    <div className={styles.inputGroup}>
-                        <label htmlFor="password">كلمة المرور</label>
-                        <input
-                            type="password"
-                            id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            className={styles.input}
-                        />
+                    {error && <div className={styles.error}>{error}</div>}
+
+                    <form onSubmit={handleSubmit} className={styles.form}>
+                        <div className={styles.inputGroup}>
+                            <label htmlFor="email">Email Address</label>
+                            <input
+                                type="email"
+                                id="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                className={styles.input}
+                                disabled={loading}
+                                placeholder="Enter your email"
+                            />
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label htmlFor="password">Password</label>
+                            <input
+                                type="password"
+                                id="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                className={styles.input}
+                                disabled={loading}
+                                placeholder="Enter your password"
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className={styles.submitBtn}
+                        >
+                            {loading ? 'Signing In...' : 'Sign In'}
+                        </button>
+                    </form>
+
+                    <div className={styles.links}>
+                        <p>
+                            Don't have an account?{' '}
+                            <Link href="/auth/register">Create New Account</Link>
+                        </p>
                     </div>
-
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className={styles.submitBtn}
-                    >
-                        {loading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
-                    </button>
-                </form>
-
-                <div className={styles.links}>
-                    <p>
-                        ليس لديك حساب؟{' '}
-                        <Link href="/auth/register">إنشاء حساب جديد</Link>
-                    </p>
                 </div>
             </div>
         </div>

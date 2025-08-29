@@ -12,7 +12,7 @@ export default function Home() {
     <div className={styles.container}>
       <HeroSection />
       <Features />
-      <ProductsPage />
+      <ProductsPage displayMode="slider" maxProducts={12} />
       <About />
       <SockShowcase />
       <Footer />

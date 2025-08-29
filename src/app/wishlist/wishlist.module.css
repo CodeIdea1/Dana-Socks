@@ -1,11 +1,11 @@
 /* wishlist.module.css */
 
 .container {
-    max-width: 1200px;
+    max-width: 1300px;
     margin: 0 auto;
-    padding: 60px 20px;
+    padding: 160px 20px 60px 20px;
     direction: rtl;
-    min-height: 80vh;
+    min-height: 100vh;
 }
 
 .header {
@@ -29,11 +29,13 @@
 
 /* Empty Wishlist Styles */
 .emptyWishlist {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
     text-align: center;
-    background: #f8f9fa;
-    border-radius: 12px;
-    max-width: 500px;
-    margin: 0 auto;
+    color: #666;
 }
 
 .emptyIcon {
@@ -43,9 +45,9 @@
 }
 
 .emptyWishlist h2 {
-    font-size: 1.8rem;
+    font-size: 44px;
+    margin-bottom: 1rem;
     color: #333;
-    margin-bottom: 15px;
 }
 
 .emptyWishlist p {
@@ -56,11 +58,10 @@
 }
 
 .shopNowBtn {
-    background: linear-gradient(135deg, #007bff, #0056b3);
+    background: linear-gradient(135deg, #3d74b6, #3d74b6);
     color: white;
     border: none;
     padding: 15px 30px;
-    border-radius: 25px;
     font-size: 1.1rem;
     font-weight: 600;
     cursor: pointer;
@@ -69,7 +70,7 @@
 }
 
 .shopNowBtn:hover {
-    background: linear-gradient(135deg, #0056b3, #004085);
+    background: linear-gradient(135deg, #3d74b6, #004085);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
 }
@@ -89,18 +90,18 @@
 
 .continueShoppingBtn {
     background: transparent;
-    color: #007bff;
-    border: 2px solid #007bff;
+    color: #3d74b6;
+    border: 2px solid#3d74b6;
     padding: 12px 30px;
-    border-radius: 25px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+
 }
 
 .continueShoppingBtn:hover {
-    background: #007bff;
+    background: #3d74b6;
     color: white;
     transform: translateY(-2px);
 }

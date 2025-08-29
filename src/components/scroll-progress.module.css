@@ -1,0 +1,160 @@
+/* components/scroll-progress.module.css */
+
+.scrollProgress {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 4px 20px rgba(61, 116, 182, 0.2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px) scale(0.8);
+    user-select: none;
+}
+
+.scrollProgress:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 30px rgba(61, 116, 182, 0.3);
+}
+
+.scrollProgress:active {
+    transform: translateY(0) scale(0.95);
+}
+
+.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px) scale(0.8);
+}
+
+.progressRing {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.progressRingBackground {
+    opacity: 0.3;
+}
+
+.progressRingCircle {
+    transition: stroke-dashoffset 0.1s ease-in-out;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 2px rgba(61, 116, 182, 0.3));
+}
+
+.iconContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3d74b6;
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.scrollProgress:hover .iconContainer {
+    color: orange;
+    transform: translateY(-1px);
+}
+
+.percentageText {
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    font-weight: 600;
+    color: #3d74b6;
+    background: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    white-space: nowrap;
+}
+
+.scrollProgress:hover .percentageText {
+    opacity: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .scrollProgress {
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+    }
+
+    .progressRing {
+        width: 50px;
+        height: 50px;
+    }
+
+    .progressRingBackground,
+    .progressRingCircle {
+        r: 20;
+        cx: 25;
+        cy: 25;
+    }
+
+    .progressRingCircle {
+        transform: rotate(-90deg);
+        transform-origin: 25px 25px;
+    }
+
+    .iconContainer {
+        font-size: 16px;
+    }
+
+    .percentageText {
+        font-size: 10px;
+        bottom: -20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .scrollProgress {
+        bottom: 15px;
+        right: 15px;
+        width: 45px;
+        height: 45px;
+    }
+
+    .progressRing {
+        width: 45px;
+        height: 45px;
+    }
+
+    .progressRingBackground,
+    .progressRingCircle {
+        r: 18;
+        cx: 22.5;
+        cy: 22.5;
+    }
+
+    .progressRingCircle {
+        transform: rotate(-90deg);
+        transform-origin: 22.5px 22.5px;
+    }
+}

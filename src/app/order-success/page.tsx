@@ -1,5 +1,4 @@
 'use client';
-// app/order-success/page.tsx
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -7,6 +6,24 @@ import Link from 'next/link';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+    CheckCircle2,
+    Package,
+    Calendar,
+    User,
+    Phone,
+    Mail,
+    MapPin,
+    CreditCard,
+    Hash,
+    ShoppingBag,
+    ArrowRight,
+    Clock,
+    Truck,
+    Shield,
+    Eye,
+    MessageCircle
+} from 'lucide-react';
 import styles from './order-success.module.css';
 
 interface OrderData {
@@ -14,7 +31,7 @@ interface OrderData {
     totalAmount: number;
     orderDate: string;
     createdAt: string;
-    userId: string; // Add this line to fix the TypeScript error
+    userId: string;
     customerInfo: {
         fullName: string;
         phone: string;
@@ -41,7 +58,6 @@ export default function OrderSuccessPage() {
     const orderId = searchParams.get('orderId');
 
     useEffect(() => {
-        // التأكد من تسجيل الدخول
         if (!authLoading && !user) {
             router.push('/auth/login');
             return;
@@ -66,9 +82,8 @@ export default function OrderSuccessPage() {
             if (orderDoc.exists()) {
                 const data = orderDoc.data() as OrderData;
 
-                // التأكد من أن الطلب يخص المستخدم الحالي
                 if (data.userId !== user.uid) {
-                    setError('غير مسموح بالوصول لهذا الطلب');
+                    setError('Access denied to this order');
                     return;
                 }
 
@@ -77,34 +92,33 @@ export default function OrderSuccessPage() {
                     orderNumber: orderId
                 });
             } else {
-                setError('لم يتم العثور على الطلب');
+                setError('Order not found');
             }
         } catch (err) {
-            console.error('خطأ في جلب بيانات الطلب:', err);
-            setError('حدث خطأ في جلب بيانات الطلب');
+            console.error('Error fetching order data:', err);
+            setError('Error occurred while fetching order data');
         } finally {
             setLoading(false);
         }
     };
 
-    // عرض التحميل أثناء فحص حالة المصادقة
     if (authLoading) {
         return (
             <div className={styles.container}>
-                <div className={styles.loading}>جاري التحميل...</div>
+                <div className={styles.loading}>Loading...</div>
             </div>
         );
     }
 
-    // إذا لم يكن المستخدم مسجل دخول
     if (!user) {
         return (
             <div className={styles.container}>
                 <div className={styles.error}>
-                    <h2>يجب تسجيل الدخول</h2>
-                    <p>يجب تسجيل الدخول لعرض تفاصيل الطلب</p>
+                    <h2>Login Required</h2>
+                    <p>You must be logged in to view order details</p>
                     <Link href="/auth/login" className={styles.button}>
-                        تسجيل الدخول
+                        <User size={20} />
+                        Login
                     </Link>
                 </div>
             </div>
@@ -114,7 +128,7 @@ export default function OrderSuccessPage() {
     if (loading) {
         return (
             <div className={styles.container}>
-                <div className={styles.loading}>جاري التحميل...</div>
+                <div className={styles.loading}>Loading...</div>
             </div>
         );
     }
@@ -123,10 +137,11 @@ export default function OrderSuccessPage() {
         return (
             <div className={styles.container}>
                 <div className={styles.error}>
-                    <h2>عذراً، حدث خطأ</h2>
+                    <h2>Sorry, an error occurred</h2>
                     <p>{error}</p>
                     <Link href="/products" className={styles.button}>
-                        العودة للمنتجات
+                        <ShoppingBag size={20} />
+                        Back to Products
                     </Link>
                 </div>
             </div>
@@ -137,72 +152,103 @@ export default function OrderSuccessPage() {
         <div className={styles.container}>
             <div className={styles.content}>
                 <div className={styles.successCard}>
-                    <div className={styles.icon}>✅</div>
+                    <div className={styles.iconContainer}>
+                        <CheckCircle2 size={40} color="white" />
+                    </div>
 
-                    <h1 className={styles.title}>تم إرسال طلبك بنجاح!</h1>
+                    <h1 className={styles.title}>Order Submitted Successfully!</h1>
 
                     <p className={styles.message}>
-                        شكراً لك {orderData?.customerInfo?.fullName}! لقد تم استلام طلبك وسيتم التواصل معك قريباً لتأكيد التوصيل.
+                        Thank you {orderData?.customerInfo?.fullName}! Your order has been received and we will contact you soon to confirm delivery.
                     </p>
 
                     {orderData && (
                         <div className={styles.orderDetails}>
-                            <h2>تفاصيل الطلب</h2>
+                            <h2>
+                                <Package size={24} />
+                                Order Details
+                            </h2>
 
                             <div className={styles.detail}>
-                                <span className={styles.label}>رقم الطلب:</span>
+                                <span className={styles.label}>
+                                    <Hash size={18} />
+                                    Order Number:
+                                </span>
                                 <span className={styles.value}>{orderData.orderNumber}</span>
                             </div>
 
                             <div className={styles.detail}>
-                                <span className={styles.label}>المجموع:</span>
-                                <span className={styles.value}>{orderData.totalAmount.toFixed(2)} ج.م</span>
+                                <span className={styles.label}>
+                                    <CreditCard size={18} />
+                                    Total:
+                                </span>
+                                <span className={styles.value}>{orderData.totalAmount.toFixed(2)} EGP</span>
                             </div>
 
                             <div className={styles.detail}>
-                                <span className={styles.label}>تاريخ الطلب:</span>
+                                <span className={styles.label}>
+                                    <Calendar size={18} />
+                                    Order Date:
+                                </span>
                                 <span className={styles.value}>
-                                    {new Date(orderData.orderDate || orderData.createdAt).toLocaleDateString('ar-EG')}
+                                    {new Date(orderData.orderDate || orderData.createdAt).toLocaleDateString('en-US')}
                                 </span>
                             </div>
 
                             <div className={styles.detail}>
-                                <span className={styles.label}>حالة الطلب:</span>
+                                <span className={styles.label}>
+                                    <Clock size={18} />
+                                    Status:
+                                </span>
                                 <span className={styles.value}>
-                                    {orderData.status === 'pending' ? 'قيد المراجعة' : orderData.status}
+                                    {orderData.status === 'pending' ? 'Under Review' : orderData.status}
                                 </span>
                             </div>
 
                             <div className={styles.detail}>
-                                <span className={styles.label}>اسم العميل:</span>
+                                <span className={styles.label}>
+                                    <User size={18} />
+                                    Customer Name:
+                                </span>
                                 <span className={styles.value}>{orderData.customerInfo.fullName}</span>
                             </div>
 
                             <div className={styles.detail}>
-                                <span className={styles.label}>رقم الهاتف:</span>
+                                <span className={styles.label}>
+                                    <Phone size={18} />
+                                    Phone Number:
+                                </span>
                                 <span className={styles.value}>{orderData.customerInfo.phone}</span>
                             </div>
 
                             <div className={styles.detail}>
-                                <span className={styles.label}>البريد الإلكتروني:</span>
+                                <span className={styles.label}>
+                                    <Mail size={18} />
+                                    Email:
+                                </span>
                                 <span className={styles.value}>{orderData.customerInfo.email}</span>
                             </div>
 
                             <div className={styles.detail}>
-                                <span className={styles.label}>عنوان التوصيل:</span>
+                                <span className={styles.label}>
+                                    <MapPin size={18} />
+                                    Delivery Address:
+                                </span>
                                 <span className={styles.value}>
                                     {orderData.customerInfo.address}, {orderData.customerInfo.city}
                                 </span>
                             </div>
 
-                            {/* عرض المنتجات المطلوبة */}
                             {orderData.items && orderData.items.length > 0 && (
                                 <div className={styles.orderItems}>
-                                    <h3>المنتجات المطلوبة:</h3>
+                                    <h3>
+                                        <ShoppingBag size={20} />
+                                        Ordered Products:
+                                    </h3>
                                     {orderData.items.map((item, index) => (
                                         <div key={index} className={styles.orderItem}>
                                             <span>{item.productName} × {item.quantity}</span>
-                                            <span>{item.subtotal} ج.م</span>
+                                            <span>{item.subtotal} EGP</span>
                                         </div>
                                     ))}
                                 </div>
@@ -211,29 +257,45 @@ export default function OrderSuccessPage() {
                     )}
 
                     <div className={styles.nextSteps}>
-                        <h3>الخطوات التالية:</h3>
+                        <h3>
+                            <ArrowRight size={20} />
+                            Next Steps:
+                        </h3>
                         <ul>
-                            <li>سيتم التواصل معك خلال 24 ساعة لتأكيد الطلب</li>
-                            <li>سيتم توصيل طلبك خلال 2-3 أيام عمل</li>
-                            <li>الدفع عند الاستلام</li>
-                            <li>يمكنك تتبع حالة طلبك من حسابك</li>
+                            <li>
+                                <Phone size={16} className={styles.stepIcon} />
+                                We will contact you within 24 hours to confirm the order
+                            </li>
+                            <li>
+                                <Truck size={16} className={styles.stepIcon} />
+                                Your order will be delivered within 2-3 business days
+                            </li>
+                            <li>
+                                <CreditCard size={16} className={styles.stepIcon} />
+                                Payment on delivery
+                            </li>
+                            <li>
+                                <Eye size={16} className={styles.stepIcon} />
+                                You can track your order status from your account
+                            </li>
                         </ul>
                     </div>
 
                     <div className={styles.actions}>
                         <Link href="/products" className={styles.button}>
-                            متابعة التسوق
-                        </Link>
-
-                        <Link href="/orders" className={styles.buttonSecondary}>
-                            عرض طلباتي
+                            <ShoppingBag size={20} />
+                            Continue Shopping
                         </Link>
                     </div>
 
                     <div className={styles.contact}>
                         <p>
-                            <strong>هل تحتاج مساعدة؟</strong><br />
-                            تواصل معنا عبر الواتساب: <a href="https://wa.me/+201000000000">01000000000</a>
+                            <Shield size={20} />
+                            <strong>Need Help?</strong>
+                            <a href="https://wa.me/+201000000000">
+                                <MessageCircle size={18} />
+                                Contact us via WhatsApp: 01000000000
+                            </a>
                         </p>
                     </div>
                 </div>

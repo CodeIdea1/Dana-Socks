@@ -1,200 +1,156 @@
+/* Existing styles for slider mode */
 .container {
-    max-width: 1300px;
+    padding: 2rem;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 20px;
-    direction: rtl;
-}
-
-.header {
-    text-align: center;
-    margin-bottom: 40px;
-}
-
-.title {
-    font-size: 2.5rem;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.subtitle {
-    font-size: 1.2rem;
-    color: #666;
-    margin-bottom: 10px;
-}
-
-.productCount {
-    font-size: 1rem;
-    color: #888;
-    font-weight: bold;
-}
-
-.warning {
-    background-color: #fff3cd;
-    border: 1px solid #ffeaa7;
-    border-radius: 8px;
-    padding: 20px;
-    text-align: center;
-    margin: 20px 0;
-    color: #856404;
-}
-
-.retryButton {
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 15px;
-    font-size: 1rem;
-    transition: background-color 0.3s;
-}
-
-.retryButton:hover {
-    background-color: #0056b3;
+    padding-top: 160px;
 }
 
 .loadingOverlay {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 50vh;
+    min-height: 400px;
 }
 
 .loadingSpinner {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.warning {
+    background: #fee;
+    border: 1px solid #fcc;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.retryButton {
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 0.5rem;
+}
+
+.retryButton:hover {
+    background: #d32f2f;
+}
+
+.swiperContainer {
+    position: relative;
+    margin: 2rem 0;
+}
+
+.productsSwiper {
+    padding: 1rem 0;
+}
+
+.swiperSlide {
+    width: auto !important;
+    max-width: 300px;
+}
+
+.swiperButtonNext,
+.swiperButtonPrev {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+.swiperButtonNext:hover,
+.swiperButtonPrev:hover {
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.swiperButtonNext {
+    right: -20px;
+}
+
+.swiperButtonPrev {
+    left: -20px;
+}
+
+.swiperPagination {
+    margin-top: 2rem !important;
+}
+
+/* New styles for grid mode */
+.productsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+    padding: 1rem 0;
+}
+
+@media (min-width: 768px) {
+    .productsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .productsGrid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1200px) {
+    .productsGrid {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
 
 .emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
     text-align: center;
-    padding: 60px 20px;
     color: #666;
 }
 
 .emptyState h2 {
-    font-size: 2rem;
-    margin-bottom: 15px;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #333;
 }
 
 .emptyState p {
-    font-size: 1.2rem;
+    color: #666;
 }
-
-/* Swiper Styles */
-.swiperContainer {
-    position: relative;
-    padding-bottom: 50px;
-}
-
-
-
-.swiperSlide {
-    height: auto;
-    display: flex;
-}
-
-.swiperButtonPrev,
-.swiperButtonNext {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
-    background-color: white;
-    border-radius: 50%;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    z-index: 10;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #007bff;
-    font-weight: bold;
-}
-
-.swiperButtonPrev::after,
-.swiperButtonNext::after {
-    font-size: 18px;
-    font-weight: bold;
-}
-
-.swiperButtonPrev {
-    left: 10px;
-}
-
-.swiperButtonNext {
-    right: 10px;
-}
-
-.swiperPagination {
-    bottom: 0;
-    position: absolute;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    padding: 15px 0;
-}
-
-.swiperPagination :global(.swiper-pagination-bullet) {
-    width: 12px;
-    height: 12px;
-    background-color: #ddd;
-    opacity: 1;
-    transition: all 0.3s ease;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.swiperPagination :global(.swiper-pagination-bullet-active) {
-    background-color: #007bff;
-    transform: scale(1.2);
-}
-
-.swiperPagination :global(.swiper-pagination-bullet:hover) {
-    background-color: #0056b3;
-    transform: scale(1.1);
-}
-
-/* إزالة شريط التمرير السفلي تماماً */
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .container {
-        padding: 15px;
+        padding: 1rem;
     }
 
-    .title {
-        font-size: 2rem;
-    }
-
-    .subtitle {
-        font-size: 1rem;
-    }
-
-    .swiperButtonPrev,
-    .swiperButtonNext {
-        width: 30px;
-        height: 30px;
-    }
-
+    .swiperButtonNext,
     .swiperButtonPrev {
-        left: 5px;
+        display: none;
     }
 
-    .swiperButtonNext {
-        right: 5px;
-    }
-
-    .swiperContainer {
-        padding-bottom: 40px;
-        /* تقليل المساحة في الموبايل */
-    }
-
-    .swiperPagination :global(.swiper-pagination-bullet) {
-        width: 10px;
-        height: 10px;
+    .productsGrid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
     }
 }
