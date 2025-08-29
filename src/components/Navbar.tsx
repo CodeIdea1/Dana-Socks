@@ -27,6 +27,15 @@ import {
 } from 'lucide-react';
 import styles from './navbar.module.css';
 
+// إضافة interface للمنتج
+interface SearchProduct {
+    id: string;
+    name: string;
+    price: number;
+    imageUrl?: string;
+    category?: string;
+}
+
 export default function Navbar() {
     const { user } = useAuth();
     const { cartItems, wishlistItems } = useCart();
@@ -40,7 +49,7 @@ export default function Navbar() {
     // Search functionality states
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
+    const [searchResults, setSearchResults] = useState<SearchProduct[]>([]); // تحديد نوع البيانات هنا
     const [isSearching, setIsSearching] = useState(false);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const searchContainerRef = useRef<HTMLDivElement>(null);
@@ -99,7 +108,7 @@ export default function Navbar() {
             // Get all products and filter client-side for better search
             const snapshot = await getDocs(query(productsRef, limit(50)));
 
-            const results = [];
+            const results: SearchProduct[] = []; // تحديد نوع البيانات هنا
             snapshot.docs.forEach(doc => {
                 const data = doc.data();
                 const productName = (data.name || '').toLowerCase();
@@ -227,8 +236,8 @@ export default function Navbar() {
 
     // Close mobile menu when clicking outside
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (isMobileMenuOpen && !event.target.closest(`.${styles.mobileMenuContainer}`)) {
+        const handleClickOutside = (event: MouseEvent) => { // إضافة نوع البيانات
+            if (isMobileMenuOpen && !event.target?.closest(`.${styles.mobileMenuContainer}`)) {
                 setIsMobileMenuOpen(false);
             }
         };
@@ -378,7 +387,8 @@ export default function Navbar() {
                                                                 src={product.imageUrl || '/placeholder.jpg'}
                                                                 alt={product.name}
                                                                 onError={(e) => {
-                                                                    e.target.src = '/placeholder.jpg';
+                                                                    const target = e.target as HTMLImageElement;
+                                                                    target.src = '/placeholder.jpg';
                                                                 }}
                                                             />
                                                         </div>
